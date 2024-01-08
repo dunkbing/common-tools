@@ -1,0 +1,12 @@
+.resizable {
+  position: relative;
+}
+
+.handle {
+  position: absolute;
+  width: 10px;
+  height: 100%;
+  right: 0;
+  cursor: ew-resize;
+  background-color: #ddd;
+}
