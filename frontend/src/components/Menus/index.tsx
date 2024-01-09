@@ -1,6 +1,5 @@
 import {
   IconSearch,
-  IconJson,
   IconLink,
   IconCodeAsterix,
   IconFileTypeHtml,
@@ -72,7 +71,7 @@ export default function Menus() {
   };
 
   return (
-    <div className="w-full h-screen m-auto font-mono p-4 bg-slate-600 opacity-90">
+    <div className="w-full h-screen m-auto p-4 bg-slate-600 opacity-90">
       <Input
         type="text"
         placeholder="Search..."
