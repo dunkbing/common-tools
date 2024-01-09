@@ -1,35 +1,38 @@
-import { SyntheticEvent, useState } from 'react';
+import { useState } from 'react';
 import { HashRouter, Route, Routes } from 'react-router-dom';
 import { Resizable } from 're-resizable';
 import Base64 from './pages/Base64';
-import Menus from './components/Menus';
-import './App.css'; // Import the resizable styles
+import Menus, { menuSlugs } from './components/Menus';
+import Jwt from './pages/Jwt';
+import Url from './pages/Url';
 
 function App() {
-  const [width, setWidth] = useState(350);
+  const [width, setWidth] = useState(370);
 
   return (
-    <div className="flex flex-row">
-      <Resizable
-        className="resizable"
-        size={{ width, height: '100%' }}
-        maxWidth={400}
-        minWidth={300}
-        enable={{ right: true }}
-        onResizeStop={(e, direction, ref, d) => {
-          setWidth(width + d.width);
-        }}
-      >
-        <Menus />
-      </Resizable>
-      <div>
-        <HashRouter basename="/">
+    <HashRouter basename="/">
+      <div className="flex flex-row">
+        <Resizable
+          className="resizable"
+          size={{ width, height: '100%' }}
+          maxWidth={420}
+          minWidth={370}
+          enable={{ right: true }}
+          onResizeStop={(e, direction, ref, d) => {
+            setWidth(width + d.width);
+          }}
+        >
+          <Menus />
+        </Resizable>
+        <div>
           <Routes>
-            <Route path="/base64" element={<Base64 />} />
+            <Route path={menuSlugs.base64} element={<Base64 />} />
+            <Route path={menuSlugs.url} element={<Url />} />
+            <Route path={menuSlugs.jwt} element={<Jwt />} />
           </Routes>
-        </HashRouter>
+        </div>
       </div>
-    </div>
+    </HashRouter>
   );
 }
 

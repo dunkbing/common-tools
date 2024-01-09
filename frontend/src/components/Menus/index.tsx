@@ -1,43 +1,96 @@
-import { IconSearch } from '@tabler/icons-react';
+import {
+  IconSearch,
+  IconJson,
+  IconLink,
+  IconCodeAsterix,
+  IconFileTypeHtml,
+  IconTransform,
+  IconPhoto,
+} from '@tabler/icons-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Input from '../Input';
+import { convertToSlug } from '../../lib/strings';
+import IconJwt from '../../assets/icons/jwt';
+import IconBase64 from '../../assets/icons/base64';
 
-const menus = [
-  'Base64 String Encode/Decode',
-  'Base64 Image Encode/Decode',
-  'URL Encode/Decode',
-  'JWT',
-  'HTML Preview',
-  'YAML to JSON',
-  'JSON to YAML',
-];
+export const menus = {
+  jsonFormatter: {
+    title: 'JSON Formatter',
+    icon: <IconCodeAsterix />,
+  },
+  base64: {
+    title: 'Base64 String Encode/Decode',
+    icon: <IconBase64 size={23} />,
+  },
+  base64Image: {
+    title: 'Base64 Image Encode/Decode',
+    icon: <IconPhoto />,
+  },
+  url: {
+    title: 'URL Encode/Decode',
+    icon: <IconLink />,
+  },
+  jwt: {
+    title: 'JWT',
+    icon: <IconJwt size={23} />,
+  },
+  html: {
+    title: 'HTML Preview',
+    icon: <IconFileTypeHtml />,
+  },
+  yaml: {
+    title: 'YAML to JSON',
+    icon: <IconTransform />,
+  },
+  json: {
+    title: 'JSON to YAML',
+    icon: <IconTransform />,
+  },
+};
+
+export const menuSlugs = {
+  jsonFormatter: convertToSlug(menus.jsonFormatter.title),
+  base64: convertToSlug(menus.base64.title),
+  base64Image: convertToSlug(menus.base64Image.title),
+  url: convertToSlug(menus.url.title),
+  jwt: convertToSlug(menus.jwt.title),
+  html: convertToSlug(menus.html.title),
+  yaml: convertToSlug(menus.yaml.title),
+  json: convertToSlug(menus.json.title),
+};
+
+export type Menu = keyof typeof menus;
 
 export default function Menus() {
-  const [selectedMenu, setSelectedMenu] = useState<number | null>(null);
+  const [selectedMenu, setSelectedMenu] = useState<Menu>('base64');
+  const navigate = useNavigate();
 
-  const handleMenuClick = (index: number) => {
-    setSelectedMenu(index);
+  const handleMenuClick = (key: Menu) => {
+    setSelectedMenu(key);
+    navigate(`/${menuSlugs[key]}`);
   };
 
   return (
-    <div className="w-full h-screen m-auto font-mono p-4 bg-slate-500 opacity-90">
+    <div className="w-full h-screen m-auto font-mono p-4 bg-slate-600 opacity-90">
       <Input
         type="text"
         placeholder="Search..."
-        icon={<IconSearch size={17} />}
+        icon={<IconSearch size={17} color="white" />}
       />
       <div className="mt-4">
-        {menus.map((menu, index) => (
+        {Object.entries(menus).map(([key, menu]) => (
           <div
-            key={index}
-            onClick={() => handleMenuClick(index)}
-            className={`px-4 py-1.5 cursor-pointer text-base ${
-              selectedMenu === index ? 'bg-blue-200' : 'bg-transparent'
+            key={key}
+            onClick={() => handleMenuClick(key as Menu)}
+            className={`flex flex-row gap-2 items-center px-4 py-1.5 cursor-pointer text-base text-white ${
+              selectedMenu === key ? 'bg-blue-500' : 'bg-transparent'
             } rounded-md my-1 font-bold ${
-              selectedMenu === index ? '' : 'font-semibold'
+              selectedMenu === key ? '' : 'font-normal'
             }`}
           >
-            {menu}
+            {menu.icon}
+            {menu.title}
           </div>
         ))}
       </div>
