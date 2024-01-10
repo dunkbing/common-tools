@@ -62,7 +62,7 @@ export const menuSlugs = {
 export type Menu = keyof typeof menus;
 
 export default function Menus() {
-  const [selectedMenu, setSelectedMenu] = useState<Menu>('base64');
+  const [selectedMenu, setSelectedMenu] = useState<Menu>('jsonFormatter');
   const navigate = useNavigate();
 
   const handleMenuClick = (key: Menu) => {

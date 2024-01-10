@@ -9,6 +9,7 @@ import {
   IconCopy,
   IconCornerRightUpDouble,
 } from '@tabler/icons-react';
+import TextArea from '../components/TextArea';
 
 const Base64Converter: React.FC = () => {
   const [outputText, setOutputText] = useState<string>('');
@@ -27,7 +28,6 @@ const Base64Converter: React.FC = () => {
             value.substring(0, selectionStart) +
             '    ' +
             value.substring(selectionEnd);
-          // setInputText(newValue);
           current.value = newValue;
           current.setSelectionRange(selectionStart + 4, selectionStart + 4);
         }
@@ -117,9 +117,8 @@ const Base64Converter: React.FC = () => {
             </Button>
           </div>
         </div>
-        <textarea
+        <TextArea
           ref={inputTextAreaRef}
-          className="border border-gray-300 rounded-md px-3 py-2 h-3/4 w-full focus:outline-none bg-slate-700"
           onChange={handleInputChange}
           placeholder={`
             - Paste your text here
