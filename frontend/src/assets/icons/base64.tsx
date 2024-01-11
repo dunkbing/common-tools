@@ -17,10 +17,10 @@ const IconBase64 = ({ size = 40, color }: IconProps) => (
     <text
       x="50%"
       y="50%"
-      dominant-baseline="middle"
-      text-anchor="middle"
-      font-size="32"
-      font-weight="bold"
+      dominantBaseline="middle"
+      textAnchor="middle"
+      fontSize="32"
+      fontWeight="bold"
       fill="white"
     >
       64

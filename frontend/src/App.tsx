@@ -3,7 +3,7 @@ import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Resizable } from 're-resizable';
 import Base64 from './pages/Base64Converter';
 import Menus, { menuSlugs } from './components/Menus';
-import Jwt from './pages/Jwt';
+import Jwt from './pages/JwtDecoder';
 import Url from './pages/Url';
 import JSONFormatter from './pages/JSONFormatter';
 
