@@ -5,7 +5,7 @@ import Base64 from './pages/Base64Converter';
 import Menus, { menuSlugs } from './components/Menus';
 import Jwt from './pages/JwtDecoder';
 import Url from './pages/Url';
-import JSONFormatter from './pages/JSONFormatter';
+import JSONViewer from './pages/JSONViewer';
 
 function App() {
   const [width, setWidth] = useState(370);
@@ -27,11 +27,8 @@ function App() {
         </Resizable>
         <div className="bg-zinc-700 w-full">
           <Routes>
-            <Route
-              path="/"
-              element={<Navigate to={menuSlugs.jsonFormatter} />}
-            />
-            <Route path={menuSlugs.jsonFormatter} element={<JSONFormatter />} />
+            <Route path="/" element={<Navigate to={menuSlugs.jsonViewer} />} />
+            <Route path={menuSlugs.jsonViewer} element={<JSONViewer />} />
             <Route path={menuSlugs.base64} element={<Base64 />} />
             <Route path={menuSlugs.url} element={<Url />} />
             <Route path={menuSlugs.jwt} element={<Jwt />} />

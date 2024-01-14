@@ -1,15 +1,16 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-  ClipboardGetText,
-  ClipboardSetText,
-} from '../../wailsjs/runtime/runtime';
-import Button from '../components/Button';
-import {
   IconClipboard,
   IconCopy,
   IconCornerRightUpDouble,
 } from '@tabler/icons-react';
+
 import TextArea from '../components/TextArea';
+import Button from '../components/Button';
+import {
+  ClipboardGetText,
+  ClipboardSetText,
+} from '../../wailsjs/runtime/runtime';
 
 const Base64Converter: React.FC = () => {
   const [outputText, setOutputText] = useState<string>('');
@@ -111,13 +112,15 @@ const Base64Converter: React.FC = () => {
             </label>
             <Button
               onClick={handlePaste}
-              className="flex flex-row items-center gap-2"
+              className="flex flex-row items-center gap-1"
             >
-              Paste from Clipboard <IconClipboard />
+              Paste
+              <IconClipboard />
             </Button>
           </div>
         </div>
         <TextArea
+          className="h-3/4"
           ref={inputTextAreaRef}
           onChange={handleInputChange}
           placeholder={`

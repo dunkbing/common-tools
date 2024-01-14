@@ -14,8 +14,8 @@ import IconJwt from '../../assets/icons/jwt';
 import IconBase64 from '../../assets/icons/base64';
 
 export const menus = {
-  jsonFormatter: {
-    title: 'JSON Formatter',
+  jsonViewer: {
+    title: 'JSON Viewer',
     icon: <IconCodeAsterix />,
   },
   base64: {
@@ -49,7 +49,7 @@ export const menus = {
 };
 
 export const menuSlugs = {
-  jsonFormatter: convertToSlug(menus.jsonFormatter.title),
+  jsonViewer: convertToSlug(menus.jsonViewer.title),
   base64: convertToSlug(menus.base64.title),
   base64Image: convertToSlug(menus.base64Image.title),
   url: convertToSlug(menus.url.title),
@@ -62,7 +62,7 @@ export const menuSlugs = {
 export type Menu = keyof typeof menus;
 
 export default function Menus() {
-  const [selectedMenu, setSelectedMenu] = useState<Menu>('jsonFormatter');
+  const [selectedMenu, setSelectedMenu] = useState<Menu>('jsonViewer');
   const navigate = useNavigate();
 
   const handleMenuClick = (key: Menu) => {

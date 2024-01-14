@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@microlink/react-json-view": "^1.23.0",
     "@tabler/icons-react": "^2.45.0",
     "jwt-decode": "^4.0.0",
     "re-resizable": "^6.9.11",
