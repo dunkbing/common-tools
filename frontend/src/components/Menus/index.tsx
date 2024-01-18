@@ -5,9 +5,11 @@ import {
   IconFileTypeHtml,
   IconTransform,
   IconPhoto,
+  IconFileTypeSvg,
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import Input from '../Input';
 import { convertToSlug } from '../../lib/strings';
 import IconJwt from '../../assets/icons/jwt';
@@ -35,7 +37,7 @@ export const menus = {
     icon: <IconJwt size={23} />,
   },
   html: {
-    title: 'HTML Preview',
+    title: 'HTML Viewer',
     icon: <IconFileTypeHtml />,
   },
   yaml: {
@@ -45,6 +47,10 @@ export const menus = {
   json: {
     title: 'JSON to YAML',
     icon: <IconTransform />,
+  },
+  svgViewer: {
+    title: 'SVG Viewer',
+    icon: <IconFileTypeSvg />,
   },
 };
 
@@ -57,6 +63,7 @@ export const menuSlugs = {
   html: convertToSlug(menus.html.title),
   yaml: convertToSlug(menus.yaml.title),
   json: convertToSlug(menus.json.title),
+  svgViewer: convertToSlug(menus.svgViewer.title),
 };
 
 export type Menu = keyof typeof menus;
@@ -71,7 +78,7 @@ export default function Menus() {
   };
 
   return (
-    <div className="w-full h-screen m-auto p-4 bg-slate-600 opacity-90">
+    <div className="w-full h-screen m-auto pt-4 px-3 bg-slate-600 opacity-90">
       <Input
         type="text"
         placeholder="Search..."
@@ -82,7 +89,7 @@ export default function Menus() {
           <div
             key={key}
             onClick={() => handleMenuClick(key as Menu)}
-            className={`flex flex-row gap-2 items-center px-4 py-1.5 cursor-pointer text-base text-white ${
+            className={`flex flex-row gap-2 items-center pl-2 py-1 cursor-pointer text-sm text-white ${
               selectedMenu === key ? 'bg-blue-500' : 'bg-transparent'
             } rounded-md my-1 font-bold ${
               selectedMenu === key ? '' : 'font-normal'

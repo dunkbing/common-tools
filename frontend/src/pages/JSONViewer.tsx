@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { IconCopy } from '@tabler/icons-react';
+import { IconCopy, IconQuestionMark } from '@tabler/icons-react';
 import ReactJSON from '@microlink/react-json-view';
 import jsonPath from 'jsonpath';
 
@@ -12,39 +12,39 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import Dropdown from '../components/Dropdown';
 
-// const sampleJson = {
-//   menu: {
-//     id: 'file',
-//     value: 'File',
-//     menuitem: [
-//       { value: 'New', onclick: 'CreateNewDoc()' },
-//       { value: 'Open', onclick: 'OpenDoc()' },
-//       { value: 'Close', onclick: 'CloseDoc()' },
-//     ],
-//   },
-// };
-
 const sampleJson = {
-  id: '0001',
-  type: 'donut',
-  name: 'Cake',
-  ppu: 0.55,
-  batters: {
-    batter: [
-      { id: '1001', type: 'Regular' },
-      { id: '1002', type: 'Chocolate' },
-      { id: '1003', type: 'Blueberry' },
-      { id: '1004', type: "Devil's Food" },
-    ],
+  id: 1,
+  name: 'John Doe',
+  email: 'john@doe.com',
+  address: {
+    street: '123 Main St',
+    city: 'New York',
+    state: 'NY',
+    zip: 10001,
   },
-  topping: [
-    { id: '5001', type: 'None' },
-    { id: '5002', type: 'Glazed' },
-    { id: '5005', type: 'Sugar' },
-    { id: '5007', type: 'Powdered Sugar' },
-    { id: '5006', type: 'Chocolate with Sprinkles' },
-    { id: '5003', type: 'Chocolate' },
-    { id: '5004', type: 'Maple' },
+  orders: [
+    {
+      id: 1,
+      date: '2021-01-01',
+      items: [
+        {
+          productId: 1,
+          quantity: 2,
+          price: 549,
+        },
+      ],
+    },
+    {
+      id: 2,
+      date: '2021-01-02',
+      items: [
+        {
+          productId: 1,
+          quantity: 1,
+          price: 549,
+        },
+      ],
+    },
   ],
 };
 
@@ -173,11 +173,16 @@ const JsonViewer: React.FC = () => {
           </div>
         </div>
         <div className={`flex flex-col gap-2 h-full max-h-full`}>
-          <Input
-            className="text-sm bg-zinc-800"
-            placeholder="JSON Path(Eg: $.menu.menuitem[0].value)"
-            onChange={(event) => queryJson(event.target.value?.trim())}
-          />
+          <div className="flex flex-row gap-2 items-center">
+            <Input
+              className="text-sm bg-zinc-800"
+              placeholder='JSON Path(Eg: $.orders[?(@.id == "1")].items[0])'
+              onChange={(event) => queryJson(event.target.value?.trim())}
+            />
+            <div className="rounded-full bg-gray-500 p-1 hover:bg-gray-400 cursor-pointer">
+              <IconQuestionMark size={20} />
+            </div>
+          </div>
           <div
             className={`border ${
               !parseErr ? 'border-gray-300' : 'border-red-500 text-red-500'

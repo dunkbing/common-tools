@@ -8,7 +8,7 @@ import Url from './pages/Url';
 import JSONViewer from './pages/JSONViewer';
 
 function App() {
-  const [width, setWidth] = useState(370);
+  const [width, setWidth] = useState(300);
 
   return (
     <HashRouter basename="/">
@@ -16,8 +16,8 @@ function App() {
         <Resizable
           className="resizable"
           size={{ width, height: '100%' }}
-          maxWidth={420}
-          minWidth={370}
+          maxWidth={350}
+          minWidth={300}
           enable={{ right: true }}
           onResizeStop={(e, direction, ref, d) => {
             setWidth(width + d.width);
