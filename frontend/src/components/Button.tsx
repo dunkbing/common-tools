@@ -1,11 +1,9 @@
 import { ButtonHTMLAttributes, ReactNode, forwardRef } from 'react';
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  icon?: ReactNode;
-}
+export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {}
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, type, children, icon, ...props }, ref) => {
+  ({ className, type, children, ...props }, ref) => {
     return (
       <button
         type={type}
