@@ -145,7 +145,7 @@ const JsonViewer: React.FC = () => {
           </div>
         </div>
         <TextArea
-          className="h-full w-full text-sm text-justify overflow-scroll"
+          className="h-full w-full text-sm text-justify overflow-y-scroll"
           ref={inputTextAreaRef}
           onChange={handleInputChange}
           placeholder="Paste your JSON here..."
@@ -172,32 +172,34 @@ const JsonViewer: React.FC = () => {
             </Button>
           </div>
         </div>
-        <div
-          className={`flex flex-col gap-2 border ${
-            !parseErr ? 'border-gray-300' : 'border-red-500 text-red-500'
-          } rounded-md bg-gray-300 px-3 py-2 h-full`}
-        >
+        <div className={`flex flex-col gap-2 h-full max-h-full`}>
           <Input
-            className="text-sm bg-zinc-600"
+            className="text-sm bg-zinc-800"
             placeholder="JSON Path(Eg: $.menu.menuitem[0].value)"
             onChange={(event) => queryJson(event.target.value?.trim())}
           />
-          {!parseErr ? (
-            <ReactJSON
-              theme="monokai"
-              src={parsedJson}
-              onEdit={console.log}
-              indentWidth={indentWidth}
-              style={{
-                padding: '0.7rem',
-                borderRadius: '0.4rem',
-              }}
-              quotesOnKeys={false}
-              name={null}
-            />
-          ) : (
-            parseErr.message
-          )}
+          <div
+            className={`border ${
+              !parseErr ? 'border-gray-300' : 'border-red-500 text-red-500'
+            } rounded-md bg-gray-300 pl-3 py-2 w-full h-full overflow-y-scroll`}
+          >
+            {!parseErr ? (
+              <ReactJSON
+                theme="monokai"
+                src={parsedJson}
+                onEdit={console.log}
+                indentWidth={indentWidth}
+                style={{
+                  padding: '0.7rem',
+                  borderRadius: '0.4rem',
+                }}
+                quotesOnKeys={false}
+                name={null}
+              />
+            ) : (
+              parseErr.message
+            )}
+          </div>
         </div>
       </div>
     </div>

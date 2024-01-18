@@ -25,7 +25,7 @@ function App() {
         >
           <Menus />
         </Resizable>
-        <div className="bg-zinc-700 w-full">
+        <div className="bg-zinc-700 w-full max-h-screen">
           <Routes>
             <Route path="/" element={<Navigate to={menuSlugs.jsonViewer} />} />
             <Route path={menuSlugs.jsonViewer} element={<JSONViewer />} />
