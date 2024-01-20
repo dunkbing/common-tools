@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { IconCopy } from '@tabler/icons-react';
 import ReactJSON from '@microlink/react-json-view';
 import jsonPath from 'jsonpath';
@@ -11,6 +11,8 @@ import Dropdown from '@/components/Dropdown';
 import sampleJson from './sample.json';
 import HtmlDialog from './CheatSheetDialog';
 
+const jsonViewerInputKey = 'json-viewer-input';
+
 const JsonViewer: React.FC = () => {
   const [parsedJson, setParsedJson] = useState<object>({});
   const [parseErr, setParseErr] = useState<Error | null>(null);
@@ -18,6 +20,17 @@ const JsonViewer: React.FC = () => {
 
   const inputTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const parsedJsonRef = useRef<object>({});
+
+  useEffect(() => {
+    const inputText = localStorage.getItem(jsonViewerInputKey);
+    if (inputText) {
+      parseJson(inputText);
+      if (inputTextAreaRef.current) {
+        inputTextAreaRef.current.value = inputText;
+        inputTextAreaRef.current.focus();
+      }
+    }
+  }, []);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     parseJson(event.target.value);
@@ -29,6 +42,7 @@ const JsonViewer: React.FC = () => {
       setParsedJson(parsedJson);
       parsedJsonRef.current = parsedJson;
       setParseErr(null);
+      localStorage.setItem(jsonViewerInputKey, inputText);
     } catch (error: any) {
       setParseErr(error);
     }
@@ -36,7 +50,7 @@ const JsonViewer: React.FC = () => {
 
   const formatJson = () => {
     const parsedJson = JSON.parse(inputTextAreaRef.current?.value || '');
-    const formattedJson = JSON.stringify(parsedJson, null, 2);
+    const formattedJson = JSON.stringify(parsedJson, null, indentWidth);
     if (!inputTextAreaRef.current) return;
     inputTextAreaRef.current.focus();
     inputTextAreaRef.current.value = formattedJson;
@@ -53,12 +67,17 @@ const JsonViewer: React.FC = () => {
   const useSampleJson = () => {
     if (!inputTextAreaRef.current) return;
     inputTextAreaRef.current.focus();
-    inputTextAreaRef.current.value = JSON.stringify(sampleJson, null, 2);
-    parseJson(JSON.stringify(sampleJson, null, 2));
+    inputTextAreaRef.current.value = JSON.stringify(
+      sampleJson,
+      null,
+      indentWidth
+    );
+    parseJson(JSON.stringify(sampleJson, null, indentWidth));
   };
 
   const handleCopy = () => {
-    ClipboardSetText(JSON.stringify(parsedJson));
+    const text = JSON.stringify(parsedJson, null, indentWidth);
+    ClipboardSetText(text);
   };
 
   const queryJson = (query: string) => {
@@ -145,7 +164,7 @@ const JsonViewer: React.FC = () => {
               <ReactJSON
                 theme="monokai"
                 src={parsedJson}
-                onEdit={console.log}
+                onEdit={false}
                 indentWidth={indentWidth}
                 style={{
                   padding: '0.7rem',
