@@ -8,6 +8,15 @@
       "ESNext"
     ],
     "allowJs": false,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "$wailsjs/*": [
+        "wailsjs/*"
+      ]
+    },
     "skipLibCheck": true,
     "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
