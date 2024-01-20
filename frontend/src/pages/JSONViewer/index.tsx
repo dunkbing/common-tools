@@ -1,52 +1,15 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { IconCopy, IconQuestionMark } from '@tabler/icons-react';
+import React, { useState, useRef } from 'react';
+import { IconCopy } from '@tabler/icons-react';
 import ReactJSON from '@microlink/react-json-view';
 import jsonPath from 'jsonpath';
 
-import TextArea from '../components/TextArea';
-import {
-  ClipboardGetText,
-  ClipboardSetText,
-} from '../../wailsjs/runtime/runtime';
-import Button from '../components/Button';
-import Input from '../components/Input';
-import Dropdown from '../components/Dropdown';
-
-const sampleJson = {
-  id: 1,
-  name: 'John Doe',
-  email: 'john@doe.com',
-  address: {
-    street: '123 Main St',
-    city: 'New York',
-    state: 'NY',
-    zip: 10001,
-  },
-  orders: [
-    {
-      id: 1,
-      date: '2021-01-01',
-      items: [
-        {
-          productId: 1,
-          quantity: 2,
-          price: 549,
-        },
-      ],
-    },
-    {
-      id: 2,
-      date: '2021-01-02',
-      items: [
-        {
-          productId: 1,
-          quantity: 1,
-          price: 549,
-        },
-      ],
-    },
-  ],
-};
+import { ClipboardSetText } from '$wailsjs/runtime/runtime';
+import TextArea from '@/components/TextArea';
+import Button from '@/components/Button';
+import Input from '@/components/Input';
+import Dropdown from '@/components/Dropdown';
+import sampleJson from './sample.json';
+import HtmlDialog from './CheatSheetDialog';
 
 const JsonViewer: React.FC = () => {
   const [parsedJson, setParsedJson] = useState<object>({});
@@ -96,14 +59,6 @@ const JsonViewer: React.FC = () => {
 
   const handleCopy = () => {
     ClipboardSetText(JSON.stringify(parsedJson));
-  };
-
-  const handlePaste = async () => {
-    const clipboardText = await ClipboardGetText();
-    if (inputTextAreaRef.current === null) return;
-    inputTextAreaRef.current.focus();
-    inputTextAreaRef.current.value = clipboardText;
-    parseJson(clipboardText);
   };
 
   const queryJson = (query: string) => {
@@ -176,12 +131,10 @@ const JsonViewer: React.FC = () => {
           <div className="flex flex-row gap-2 items-center">
             <Input
               className="text-sm bg-zinc-800"
-              placeholder='JSON Path(Eg: $.orders[?(@.id == "1")].items[0])'
+              placeholder="JSON Path(Eg: $.store.book[?(@.price < 10)])"
               onChange={(event) => queryJson(event.target.value?.trim())}
             />
-            <div className="rounded-full bg-gray-500 p-1 hover:bg-gray-400 cursor-pointer">
-              <IconQuestionMark size={20} />
-            </div>
+            <HtmlDialog />
           </div>
           <div
             className={`border ${

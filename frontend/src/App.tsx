@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { Resizable } from 're-resizable';
-import Base64 from './pages/Base64Converter';
+
 import Menus, { menuSlugs } from './components/Menus';
+import Base64 from './pages/Base64Converter';
 import Jwt from './pages/JwtDecoder';
 import Url from './pages/Url';
 import JSONViewer from './pages/JSONViewer';
+import SvgViewer from './pages/SvgViewer';
 
 function App() {
   const [width, setWidth] = useState(300);
@@ -32,6 +34,7 @@ function App() {
             <Route path={menuSlugs.base64} element={<Base64 />} />
             <Route path={menuSlugs.url} element={<Url />} />
             <Route path={menuSlugs.jwt} element={<Jwt />} />
+            <Route path={menuSlugs.svgViewer} element={<SvgViewer />} />
           </Routes>
         </div>
       </div>
