@@ -114,7 +114,7 @@ const Base64Converter: React.FC = () => {
               onClick={handlePaste}
               className="flex flex-row items-center gap-1"
             >
-              Paste
+              Clipboard
               <IconClipboard />
             </Button>
           </div>

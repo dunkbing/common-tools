@@ -1,13 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { IconCopy } from '@tabler/icons-react';
+import { IconClipboard, IconCopy } from '@tabler/icons-react';
 import ReactJSON from '@microlink/react-json-view';
 import jsonPath from 'jsonpath';
 
-import { ClipboardSetText } from '$wailsjs/runtime/runtime';
+import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
 import TextArea from '@/components/TextArea';
 import Button from '@/components/Button';
 import Input from '@/components/Input';
-import Dropdown from '@/components/Dropdown';
+import Dropdown, { Option } from '@/components/Dropdown';
 import sampleJson from './sample.json';
 import HtmlDialog from './CheatSheetDialog';
 
@@ -37,6 +37,12 @@ const JsonViewer: React.FC = () => {
   };
 
   const parseJson = (inputText: string) => {
+    if (!inputText) {
+      setParsedJson({});
+      setParseErr(null);
+      return;
+    }
+
     try {
       const parsedJson = JSON.parse(inputText);
       setParsedJson(parsedJson);
@@ -48,12 +54,20 @@ const JsonViewer: React.FC = () => {
     }
   };
 
-  const formatJson = () => {
+  const formatJson = (indentWidth: number) => {
     const parsedJson = JSON.parse(inputTextAreaRef.current?.value || '');
     const formattedJson = JSON.stringify(parsedJson, null, indentWidth);
     if (!inputTextAreaRef.current) return;
     inputTextAreaRef.current.focus();
     inputTextAreaRef.current.value = formattedJson;
+  };
+
+  const handlePaste = async () => {
+    const clipboardText = await ClipboardGetText();
+    if (!inputTextAreaRef.current) return;
+    inputTextAreaRef.current.focus();
+    inputTextAreaRef.current.value = clipboardText;
+    parseJson(clipboardText);
   };
 
   const minifyJson = () => {
@@ -92,6 +106,12 @@ const JsonViewer: React.FC = () => {
     } catch (error: any) {}
   };
 
+  const changeSpaces = (option: Option): void => {
+    const newIndentWidth = Number(option.value);
+    setIndentWidth(newIndentWidth);
+    formatJson(newIndentWidth);
+  };
+
   return (
     <div className="flex flex-row pb-8 px-8 w-full h-full items-center justify-center gap-8">
       <div className="h-5/6 w-1/2">
@@ -99,7 +119,14 @@ const JsonViewer: React.FC = () => {
           <label className="font-semibold">Input JSON</label>
           <div className="flex flex-row gap-2 items-center">
             <Button
-              onClick={formatJson}
+              onClick={handlePaste}
+              className="flex flex-row items-center gap-1"
+            >
+              Clipboard
+              <IconClipboard />
+            </Button>
+            <Button
+              onClick={() => formatJson(indentWidth)}
               className="flex flex-row items-center gap-1"
             >
               Format
@@ -130,7 +157,7 @@ const JsonViewer: React.FC = () => {
           <div className="flex flex-row items-center gap-3">
             <label className="font-semibold">Formatted JSON</label>
             <Dropdown
-              onChange={(option) => setIndentWidth(Number(option.value))}
+              onChange={changeSpaces}
               options={[
                 { label: '2 spaces', value: '2' },
                 { label: '4 spaces', value: '4' },

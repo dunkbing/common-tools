@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { IconCaretUp, IconCaretDown } from '@tabler/icons-react';
 import Button from './Button';
 
-interface Option {
+export interface Option {
   label: string;
   value: string;
 }
