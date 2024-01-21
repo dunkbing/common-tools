@@ -10,6 +10,7 @@ import Input from '@/components/Input';
 import Dropdown, { Option } from '@/components/Dropdown';
 import sampleJson from './sample.json';
 import HtmlDialog from './CheatSheetDialog';
+import { jsonViewerStyles } from '@/lib/constants';
 
 const jsonViewerInputKey = 'json-viewer-input';
 
@@ -193,10 +194,7 @@ const JsonViewer: React.FC = () => {
                 src={parsedJson}
                 onEdit={false}
                 indentWidth={indentWidth}
-                style={{
-                  padding: '0.7rem',
-                  borderRadius: '0.4rem',
-                }}
+                style={jsonViewerStyles}
                 quotesOnKeys={false}
                 name={null}
               />
