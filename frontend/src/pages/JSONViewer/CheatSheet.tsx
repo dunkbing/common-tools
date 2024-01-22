@@ -5,7 +5,6 @@ const expressions = [
   { jsonPath: '$', description: 'the root object/element' },
   { jsonPath: '@', description: 'the current object/element' },
   { jsonPath: '. or []', description: 'child operator' },
-  { jsonPath: 'n/a', description: 'parent operator' },
   {
     jsonPath: '..',
     description: 'recursive descent. JSONPath borrows this syntax from E4X.',
