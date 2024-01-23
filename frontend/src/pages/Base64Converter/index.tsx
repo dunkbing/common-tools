@@ -5,16 +5,17 @@ import {
   IconCornerRightUpDouble,
 } from '@tabler/icons-react';
 
-import TextArea from '../components/TextArea';
-import Button from '../components/Button';
-import {
-  ClipboardGetText,
-  ClipboardSetText,
-} from '../../wailsjs/runtime/runtime';
+import TextArea from '@/components/TextArea';
+import Button from '@/components/Button';
+import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
 
 const Base64Converter: React.FC = () => {
   const [outputText, setOutputText] = useState<string>('');
   const [isEncode, setIsEncode] = useState<boolean>(true);
+  const [searchVisible, setSearchVisible] = useState(false);
+  const [replaceVisible, setReplaceVisible] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [replaceText, setReplaceText] = useState('');
 
   const inputTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -33,12 +34,31 @@ const Base64Converter: React.FC = () => {
           current.setSelectionRange(selectionStart + 4, selectionStart + 4);
         }
       }
+
+      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
+        setSearchVisible(true);
+        setReplaceVisible(false);
+        event.preventDefault();
+      } else if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+        setSearchVisible(false);
+        setReplaceVisible(true);
+        event.preventDefault();
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSearchVisible(false);
+        setReplaceVisible(false);
+      }
     };
 
     window.addEventListener('keydown', handleTabKeyPress);
+    window.addEventListener('keyup', handleKeyUp);
 
     return () => {
       window.removeEventListener('keydown', handleTabKeyPress);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
 
