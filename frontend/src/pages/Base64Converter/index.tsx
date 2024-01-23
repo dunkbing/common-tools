@@ -1,21 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  IconClipboard,
-  IconCopy,
-  IconCornerRightUpDouble,
-} from '@tabler/icons-react';
 
 import TextArea from '@/components/TextArea';
-import Button from '@/components/Button';
 import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
+import InputActions from './InputActions';
+import OutputActions from './OutputActions';
 
 const Base64Converter: React.FC = () => {
   const [outputText, setOutputText] = useState<string>('');
   const [isEncode, setIsEncode] = useState<boolean>(true);
-  const [searchVisible, setSearchVisible] = useState(false);
-  const [replaceVisible, setReplaceVisible] = useState(false);
-  const [searchText, setSearchText] = useState('');
-  const [replaceText, setReplaceText] = useState('');
 
   const inputTextAreaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -34,31 +26,12 @@ const Base64Converter: React.FC = () => {
           current.setSelectionRange(selectionStart + 4, selectionStart + 4);
         }
       }
-
-      if ((event.ctrlKey || event.metaKey) && event.key === 'f') {
-        setSearchVisible(true);
-        setReplaceVisible(false);
-        event.preventDefault();
-      } else if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
-        setSearchVisible(false);
-        setReplaceVisible(true);
-        event.preventDefault();
-      }
-    };
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setSearchVisible(false);
-        setReplaceVisible(false);
-      }
     };
 
     window.addEventListener('keydown', handleTabKeyPress);
-    window.addEventListener('keyup', handleKeyUp);
 
     return () => {
       window.removeEventListener('keydown', handleTabKeyPress);
-      window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
 
@@ -108,37 +81,12 @@ const Base64Converter: React.FC = () => {
 
   return (
     <div className="flex flex-col p-8 w-full h-full mx-auto">
-      <div className="h-1/2">
-        <div className="mb-3 flex flex-row items-center justify-between">
-          <label className="font-semibold">Input</label>
-          <div className="flex flex-row gap-2 items-center">
-            <label>
-              <input
-                type="radio"
-                value="encode"
-                checked={isEncode}
-                onChange={handleEncodeDecodeChange}
-              />
-              <span className="ml-2">Encode</span>
-            </label>
-            <label>
-              <input
-                type="radio"
-                value="decode"
-                checked={!isEncode}
-                onChange={handleEncodeDecodeChange}
-              />
-              <span className="ml-2">Decode</span>
-            </label>
-            <Button
-              onClick={handlePaste}
-              className="flex flex-row items-center gap-1"
-            >
-              Clipboard
-              <IconClipboard />
-            </Button>
-          </div>
-        </div>
+      <div className="h-1/2 flex flex-col gap-1">
+        <InputActions
+          isEncode={isEncode}
+          handleEncodeDecodeChange={handleEncodeDecodeChange}
+          handlePaste={handlePaste}
+        />
         <TextArea
           className="h-3/4"
           ref={inputTextAreaRef}
@@ -153,26 +101,11 @@ const Base64Converter: React.FC = () => {
         />
       </div>
       <div className="h-1/2">
-        <div className="mb-3 flex flex-row items-center justify-between">
-          <label className="font-semibold">Output</label>
-          <div className="flex flex-row gap-2 items-center">
-            <Button
-              onClick={handleCopy}
-              className="flex flex-row items-center gap-1"
-            >
-              Copy
-              <IconCopy />
-            </Button>
-            <Button
-              onClick={handleUseAsInput}
-              className="flex flex-row items-center gap-1"
-            >
-              Use as input
-              <IconCornerRightUpDouble />
-            </Button>
-          </div>
-        </div>
-        <div className="border border-gray-300 rounded-md bg-slate-700 px-3 py-2 min-h-16 h-3/4">
+        <OutputActions
+          handleCopy={handleCopy}
+          handleUseAsInput={handleUseAsInput}
+        />
+        <div className="border border-gray-300 rounded-md bg-slate-700 px-3 py-2 min-h-16 h-3/4 break-all overflow-y-auto">
           {outputText}
         </div>
       </div>
