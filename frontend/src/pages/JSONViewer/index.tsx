@@ -116,15 +116,15 @@ const JsonViewer: React.FC = () => {
   return (
     <div className="flex flex-row pb-8 px-8 w-full h-full items-center justify-center gap-8">
       <div className="h-5/6 w-1/2">
-        <div className="mb-4 flex flex-row items-center justify-between">
-          <label className="font-semibold">Input JSON</label>
-          <div className="flex flex-row gap-2 items-center">
+        <div className="mb-3 flex flex-row items-center justify-between">
+          <label className="font-semibold text-sm">Input</label>
+          <div className="flex flex-row gap-1.5 items-center">
             <Button
               onClick={handlePaste}
               className="flex flex-row items-center gap-1"
             >
               Clipboard
-              <IconClipboard />
+              <IconClipboard size={16} />
             </Button>
             <Button
               onClick={() => formatJson(indentWidth)}
@@ -150,13 +150,20 @@ const JsonViewer: React.FC = () => {
           className="h-full w-full text-sm text-justify overflow-y-scroll"
           ref={inputTextAreaRef}
           onChange={handleInputChange}
-          placeholder="Paste your JSON here..."
+          placeholder={`Paste your JSON here...\nEg:
+{
+  "category": "fiction",
+  "author": "J. R. R. Tolkien",
+  "title": "The Lord of the Rings",
+  "price": 11.59
+}
+`}
         />
       </div>
       <div className="h-5/6 w-1/2">
-        <div className="mb-4 flex flex-row items-center justify-between">
+        <div className="mb-3 flex flex-row items-center justify-between">
           <div className="flex flex-row items-center gap-3">
-            <label className="font-semibold">Formatted JSON</label>
+            <label className="font-semibold text-sm">Formatted JSON</label>
             <Dropdown
               onChange={changeSpaces}
               options={[
