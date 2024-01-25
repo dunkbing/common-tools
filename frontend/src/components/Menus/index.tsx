@@ -10,7 +10,7 @@ import {
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import Input from '../Input';
+import IconInput from '../IconInput';
 import { convertToSlug } from '../../lib/strings';
 import IconJwt from '../../assets/icons/jwt';
 import IconBase64 from '../../assets/icons/base64';
@@ -79,7 +79,7 @@ export default function Menus() {
 
   return (
     <div className="w-full h-screen m-auto pt-4 px-3 bg-slate-600 opacity-90">
-      <Input
+      <IconInput
         type="text"
         placeholder="Search..."
         icon={<IconSearch size={17} color="white" />}

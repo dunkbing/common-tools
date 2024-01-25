@@ -2,15 +2,18 @@ import React, { useState, useRef, useEffect } from 'react';
 import { IconClipboard, IconCopy } from '@tabler/icons-react';
 import ReactJSON from '@microlink/react-json-view';
 import jsonPath from 'jsonpath';
-
+import { OnChange, OnMount, Editor, useMonaco } from '@monaco-editor/react';
+import { editor } from 'monaco-editor';
 import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
-import TextArea from '@/components/TextArea';
+
 import Button from '@/components/Button';
-import Input from '@/components/Input';
+import IconInput from '@/components/IconInput';
 import Dropdown, { Option } from '@/components/Dropdown';
 import sampleJson from './sample.json';
+import nordTheme from './nord.json';
 import HtmlDialog from './CheatSheetDialog';
 import { jsonViewerStyles } from '@/lib/constants';
+import EditorPlaceHolder from '@/components/EditorPlaceHolder';
 
 const jsonViewerInputKey = 'json-viewer-input';
 
@@ -19,25 +22,32 @@ const JsonViewer: React.FC = () => {
   const [parseErr, setParseErr] = useState<Error | null>(null);
   const [indentWidth, setIndentWidth] = useState<number>(2);
 
-  const inputTextAreaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const parsedJsonRef = useRef<object>({});
 
+  const monaco = useMonaco();
+
   useEffect(() => {
+    monaco?.editor.defineTheme('nord', nordTheme as any);
+    monaco?.editor.setTheme('nord');
+  }, []);
+
+  const handleEditorDidMount: OnMount = (editor, monaco) => {
+    editor.focus();
+    editorRef.current = editor;
     const inputText = localStorage.getItem(jsonViewerInputKey);
     if (inputText) {
       parseJson(inputText);
-      if (inputTextAreaRef.current) {
-        inputTextAreaRef.current.value = inputText;
-        inputTextAreaRef.current.focus();
-      }
+      editorRef.current.focus();
+      editorRef.current.setValue(inputText);
     }
-  }, []);
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    parseJson(event.target.value);
   };
 
-  const parseJson = (inputText: string) => {
+  const handleInputChange: OnChange = (value) => {
+    parseJson(value);
+  };
+
+  const parseJson = (inputText?: string) => {
     if (!inputText) {
       setParsedJson({});
       setParseErr(null);
@@ -56,37 +66,33 @@ const JsonViewer: React.FC = () => {
   };
 
   const formatJson = (indentWidth: number) => {
-    const parsedJson = JSON.parse(inputTextAreaRef.current?.value || '');
+    const parsedJson = JSON.parse(editorRef.current?.getValue() || '');
     const formattedJson = JSON.stringify(parsedJson, null, indentWidth);
-    if (!inputTextAreaRef.current) return;
-    inputTextAreaRef.current.focus();
-    inputTextAreaRef.current.value = formattedJson;
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    editorRef.current.setValue(formattedJson);
   };
 
   const handlePaste = async () => {
     const clipboardText = await ClipboardGetText();
-    if (!inputTextAreaRef.current) return;
-    inputTextAreaRef.current.focus();
-    inputTextAreaRef.current.value = clipboardText;
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    editorRef.current.setValue(clipboardText);
     parseJson(clipboardText);
   };
 
   const minifyJson = () => {
-    const parsedJson = JSON.parse(inputTextAreaRef.current?.value || '');
+    const parsedJson = JSON.parse(editorRef.current?.getValue() || '');
     const minifiedJson = JSON.stringify(parsedJson);
-    if (!inputTextAreaRef.current) return;
-    inputTextAreaRef.current.focus();
-    inputTextAreaRef.current.value = minifiedJson;
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    editorRef.current.setValue(minifiedJson);
   };
 
   const useSampleJson = () => {
-    if (!inputTextAreaRef.current) return;
-    inputTextAreaRef.current.focus();
-    inputTextAreaRef.current.value = JSON.stringify(
-      sampleJson,
-      null,
-      indentWidth
-    );
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    editorRef.current.setValue(JSON.stringify(sampleJson, null, indentWidth));
     parseJson(JSON.stringify(sampleJson, null, indentWidth));
   };
 
@@ -146,11 +152,9 @@ const JsonViewer: React.FC = () => {
             </Button>
           </div>
         </div>
-        <TextArea
+        <EditorPlaceHolder
           className="h-full w-full text-sm text-justify overflow-y-scroll"
-          ref={inputTextAreaRef}
-          onChange={handleInputChange}
-          placeholder={`Paste your JSON here...\nEg:
+          placeholders={`Paste your JSON here...\nEg:
 {
   "category": "fiction",
   "author": "J. R. R. Tolkien",
@@ -158,7 +162,15 @@ const JsonViewer: React.FC = () => {
   "price": 11.59
 }
 `}
-        />
+        >
+          <Editor
+            height="100%"
+            language="json"
+            theme="nord"
+            onChange={handleInputChange}
+            onMount={handleEditorDidMount}
+          />
+        </EditorPlaceHolder>
       </div>
       <div className="h-5/6 w-1/2">
         <div className="mb-3 flex flex-row items-center justify-between">
@@ -183,7 +195,7 @@ const JsonViewer: React.FC = () => {
         </div>
         <div className={`flex flex-col gap-2 h-full max-h-full`}>
           <div className="flex flex-row gap-2 items-center">
-            <Input
+            <IconInput
               className="text-sm bg-zinc-800"
               placeholder="JSON Path(Eg: $.store.book[?(@.price < 10)])"
               onChange={(event) => queryJson(event.target.value?.trim())}
