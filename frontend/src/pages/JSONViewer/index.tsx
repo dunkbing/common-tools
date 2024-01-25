@@ -11,7 +11,7 @@ import IconInput from '@/components/IconInput';
 import Dropdown, { Option } from '@/components/Dropdown';
 import sampleJson from './sample.json';
 import nordTheme from './nord.json';
-import HtmlDialog from './CheatSheetDialog';
+import CheatSheetDialog from './CheatSheetDialog';
 import { jsonViewerStyles } from '@/lib/constants';
 import EditorPlaceHolder from '@/components/EditorPlaceHolder';
 
@@ -30,7 +30,7 @@ const JsonViewer: React.FC = () => {
   useEffect(() => {
     monaco?.editor.defineTheme('nord', nordTheme as any);
     monaco?.editor.setTheme('nord');
-  }, []);
+  }, [monaco]);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
     editor.focus();
@@ -200,7 +200,7 @@ const JsonViewer: React.FC = () => {
               placeholder="JSON Path(Eg: $.store.book[?(@.price < 10)])"
               onChange={(event) => queryJson(event.target.value?.trim())}
             />
-            <HtmlDialog />
+            <CheatSheetDialog />
           </div>
           <div
             className={`border ${

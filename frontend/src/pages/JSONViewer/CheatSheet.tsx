@@ -80,7 +80,7 @@ const examples = [
 
 const JSONPathCheatSheet = () => {
   return (
-    <>
+    <div className="h-80 text-zinc-100 shadow-lg">
       <h1 className="text-lg font-bold">JSONPath Expressions</h1>
       Reference :{' '}
       <a
@@ -94,7 +94,7 @@ const JSONPathCheatSheet = () => {
       >
         https://goessner.net/articles/JsonPath/
       </a>
-      <table className="table-auto w-2/3 text-sm mt-2">
+      <table className="table-auto text-sm mt-2">
         <thead>
           <tr>
             <th className="py-2 px-4 border">JSONPath</th>
@@ -111,10 +111,10 @@ const JSONPathCheatSheet = () => {
         </tbody>
       </table>
       <h1 className="text-lg font-bold mt-4">JSONPath Examples</h1>
-      <pre className="text-xs bg-slate-900 text-slate-200 p-3 rounded-md w-2/3">
+      <pre className="text-xs bg-slate-900 text-slate-200 p-3 rounded-md">
         {JSON.stringify(sampleJson, null, 2)}
       </pre>
-      <table className="table-auto w-2/3 text-sm mt-2">
+      <table className="table-auto text-sm mt-2">
         <thead>
           <tr>
             <th className="py-2 px-4 border">JSONPath</th>
@@ -130,7 +130,7 @@ const JSONPathCheatSheet = () => {
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   );
 };
 
