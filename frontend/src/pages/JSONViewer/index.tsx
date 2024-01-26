@@ -169,6 +169,15 @@ const JsonViewer: React.FC = () => {
             theme="nord"
             onChange={handleInputChange}
             onMount={handleEditorDidMount}
+            options={{
+              minimap: {
+                enabled: false,
+              },
+              scrollBeyondLastLine: false,
+              renderLineHighlight: 'none',
+              tabSize: indentWidth,
+            }}
+            keepCurrentModel
           />
         </EditorPlaceHolder>
       </div>
