@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
-import InputActions from './InputActions';
-import OutputActions from './OutputActions';
 import { Textarea } from '@/components/ui/textarea';
+import InputActions from '../Base64Converter/InputActions';
+import OutputActions from '../Base64Converter/OutputActions';
 
-const Base64Converter: React.FC = () => {
+const UrlEncodeDecode: React.FC = () => {
   const [outputText, setOutputText] = useState<string>('');
   const [isEncode, setIsEncode] = useState<boolean>(true);
 
@@ -39,10 +39,12 @@ const Base64Converter: React.FC = () => {
     handleConvert(textAreaRef.current?.value || '');
   }, [isEncode]);
 
+  const convertText = (text: string) => {
+    return isEncode ? encodeURIComponent(text) : decodeURIComponent(text);
+  };
+
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setOutputText(
-      isEncode ? btoa(event.target.value) : atob(event.target.value)
-    );
+    handleConvert(event.target.value);
   };
 
   const handleEncodeDecodeChange = (
@@ -53,7 +55,7 @@ const Base64Converter: React.FC = () => {
 
   const handleConvert = (inputText: string) => {
     try {
-      setOutputText(isEncode ? btoa(inputText) : atob(inputText));
+      setOutputText(convertText(inputText));
     } catch (error) {
       setOutputText('Invalid input for decoding');
     }
@@ -91,13 +93,7 @@ const Base64Converter: React.FC = () => {
           className="h-3/4 bg-slate-700"
           ref={textAreaRef}
           onChange={handleInputChange}
-          placeholder={`
-            - Paste your text here
-            - Drag and drop a file here
-            - Right click -> Load from file
-            - Ctrl/Cmd + F to search
-            - Ctrl/Cmd + Shift + F to replace
-          `}
+          placeholder="Type or paste here..."
         />
       </div>
       <div className="h-1/2">
@@ -107,12 +103,13 @@ const Base64Converter: React.FC = () => {
         />
         <Textarea
           className="bg-slate-700 px-3 py-2 min-h-16 h-3/4 break-all overflow-y-auto"
-          value={outputText}
           disabled
+          value={outputText}
+          placeholder="Output will appear here..."
         />
       </div>
     </div>
   );
 };
 
-export default Base64Converter;
+export default UrlEncodeDecode;

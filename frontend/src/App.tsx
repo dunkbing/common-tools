@@ -5,9 +5,9 @@ import { Resizable } from 're-resizable';
 import Menus, { menuSlugs } from './components/Menus';
 import Base64 from './pages/Base64Converter';
 import Jwt from './pages/JwtDecoder';
-import Url from './pages/Url';
 import JSONViewer from './pages/JSONViewer';
 import SvgViewer from './pages/SvgViewer';
+import UrlEncodeDecode from './pages/UrlEncodeDecode';
 
 function App() {
   const [width, setWidth] = useState(320);
@@ -32,7 +32,7 @@ function App() {
             <Route path="/" element={<Navigate to={menuSlugs.jsonViewer} />} />
             <Route path={menuSlugs.jsonViewer} element={<JSONViewer />} />
             <Route path={menuSlugs.base64} element={<Base64 />} />
-            <Route path={menuSlugs.url} element={<Url />} />
+            <Route path={menuSlugs.url} element={<UrlEncodeDecode />} />
             <Route path={menuSlugs.jwt} element={<Jwt />} />
             <Route path={menuSlugs.svgViewer} element={<SvgViewer />} />
           </Routes>
