@@ -10,7 +10,7 @@ import JSONViewer from './pages/JSONViewer';
 import SvgViewer from './pages/SvgViewer';
 
 function App() {
-  const [width, setWidth] = useState(300);
+  const [width, setWidth] = useState(320);
 
   return (
     <HashRouter basename="/">
@@ -18,8 +18,8 @@ function App() {
         <Resizable
           className="resizable"
           size={{ width, height: '100%' }}
-          maxWidth={350}
-          minWidth={300}
+          maxWidth={390}
+          minWidth={250}
           enable={{ right: true }}
           onResizeStop={(e, direction, ref, d) => {
             setWidth(width + d.width);

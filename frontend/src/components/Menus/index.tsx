@@ -1,19 +1,30 @@
 import {
-  IconSearch,
   IconLink,
   IconCodeAsterix,
   IconFileTypeHtml,
   IconTransform,
   IconPhoto,
   IconFileTypeSvg,
+  IconUser,
+  IconMail,
+  IconSettings,
 } from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import IconInput from '../IconInput';
 import { convertToSlug } from '../../lib/strings';
 import IconJwt from '../../assets/icons/jwt';
 import IconBase64 from '../../assets/icons/base64';
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandSeparator,
+} from '@/components/ui/command';
+import { CommandShortcut } from '../ui/command';
 
 export const menus = {
   jsonViewer: {
@@ -73,33 +84,59 @@ export default function Menus() {
   const navigate = useNavigate();
 
   const handleMenuClick = (key: Menu) => {
-    setSelectedMenu(key);
-    navigate(`/${menuSlugs[key]}`);
+    return () => {
+      setSelectedMenu(key);
+      navigate(`/${menuSlugs[key]}`);
+    };
   };
 
+  const selectedStyle = 'bg-slate-200 text-slate-800 pointer-events-none';
+  const defaultStyle =
+    'aria-selected:bg-slate-800 aria-selected:text-white hover:cursor-pointer';
+
   return (
-    <div className="w-full h-screen m-auto pt-4 px-3 bg-slate-600 opacity-90">
-      <IconInput
-        type="text"
-        placeholder="Search..."
-        icon={<IconSearch size={17} color="white" />}
-      />
-      <div className="mt-4">
-        {Object.entries(menus).map(([key, menu]) => (
-          <div
-            key={key}
-            onClick={() => handleMenuClick(key as Menu)}
-            className={`flex flex-row gap-2 items-center pl-2 py-1 cursor-pointer text-sm text-white ${
-              selectedMenu === key ? 'bg-blue-500' : 'bg-transparent'
-            } rounded-md my-1 font-bold ${
-              selectedMenu === key ? '' : 'font-normal'
-            }`}
+    <div className="w-full h-screen m-auto py-4 px-3 bg-slate-800 opacity-90">
+      <Command className="text-slate-50 bg-slate-800">
+        <CommandInput className="text-slate-200" placeholder="Search..." />
+        <CommandList className="max-h-screen mb-2">
+          <CommandEmpty>No results found.</CommandEmpty>
+          <CommandGroup
+            heading="Suggestions"
+            className="text-slate-200 text-sm"
           >
-            {menu.icon}
-            {menu.title}
-          </div>
-        ))}
-      </div>
+            {Object.entries(menus).map(([key, menu]) => (
+              <CommandItem
+                key={key}
+                onSelect={handleMenuClick(key as Menu)}
+                className={`gap-2 font-semibold ${
+                  selectedMenu === key ? selectedStyle : defaultStyle
+                }`}
+              >
+                {menu.icon}
+                <span>{menu.title}</span>
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandSeparator />
+          <CommandGroup heading="Others" className="text-slate-50 text-sm">
+            <CommandItem>
+              <IconUser className="mr-2 h-4 w-4" />
+              <span>Profile</span>
+              <CommandShortcut>⌘P</CommandShortcut>
+            </CommandItem>
+            <CommandItem>
+              <IconMail className="mr-2 h-4 w-4" />
+              <span>Mail</span>
+              <CommandShortcut>⌘B</CommandShortcut>
+            </CommandItem>
+            <CommandItem>
+              <IconSettings className="mr-2 h-4 w-4" />
+              <span>Settings</span>
+              <CommandShortcut>⌘S</CommandShortcut>
+            </CommandItem>
+          </CommandGroup>
+        </CommandList>
+      </Command>
     </div>
   );
 }
