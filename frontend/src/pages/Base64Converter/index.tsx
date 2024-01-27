@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-import TextArea from '@/components/TextArea';
 import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
 import InputActions from './InputActions';
 import OutputActions from './OutputActions';
+import { Textarea } from '@/components/ui/textarea';
 
 const Base64Converter: React.FC = () => {
   const [outputText, setOutputText] = useState<string>('');
@@ -87,8 +87,8 @@ const Base64Converter: React.FC = () => {
           handleEncodeDecodeChange={handleEncodeDecodeChange}
           handlePaste={handlePaste}
         />
-        <TextArea
-          className="h-3/4"
+        <Textarea
+          className="h-3/4 bg-slate-700"
           ref={inputTextAreaRef}
           onChange={handleInputChange}
           placeholder={`

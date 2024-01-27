@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { JwtHeader, JwtPayload, jwtDecode } from 'jwt-decode';
 import ReactJSON from '@microlink/react-json-view';
 
-import TextArea from '../components/TextArea';
 import { jsonViewerStyles } from '@/lib/constants';
+import { Textarea } from '@/components/ui/textarea';
 
 interface DecodedToken {
   header: JwtHeader;
@@ -71,11 +71,11 @@ const JWTDecoder: React.FC = () => {
     <div className="flex flex-row p-8 w-full h-full mx-auto">
       <div className="w-1/2 pr-4">
         <label className="block mb-2 font-semibold">JWT Token</label>
-        <TextArea
+        <Textarea
           onChange={handleInputChange}
           value={jwtToken}
           placeholder="Paste your JWT token here..."
-          className="h-5/6"
+          className="h-5/6 bg-slate-700"
         />
       </div>
       <div className="w-1/2 pl-4">
