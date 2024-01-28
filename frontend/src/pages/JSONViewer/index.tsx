@@ -14,6 +14,7 @@ import nordTheme from './nord.json';
 import CheatSheetDialog from './CheatSheetDialog';
 import { jsonViewerStyles } from '@/lib/constants';
 import EditorPlaceHolder from '@/components/EditorPlaceHolder';
+import { displayEditorPlaceholders } from '@/lib/utils';
 
 const jsonViewerInputKey = 'json-viewer-input';
 
@@ -33,10 +34,12 @@ const JsonViewer: React.FC = () => {
   }, [monaco]);
 
   const handleEditorDidMount: OnMount = (editor, monaco) => {
+    displayEditorPlaceholders(true);
     editor.focus();
     editorRef.current = editor;
     const inputText = localStorage.getItem(jsonViewerInputKey);
     if (inputText) {
+      displayEditorPlaceholders(false);
       parseJson(inputText);
       editorRef.current.focus();
       editorRef.current.setValue(inputText);
@@ -45,6 +48,7 @@ const JsonViewer: React.FC = () => {
 
   const handleInputChange: OnChange = (value) => {
     parseJson(value);
+    displayEditorPlaceholders(!!!value);
   };
 
   const parseJson = (inputText?: string) => {
@@ -153,7 +157,7 @@ const JsonViewer: React.FC = () => {
           </div>
         </div>
         <EditorPlaceHolder
-          className="h-full w-full text-sm text-justify overflow-y-scroll"
+          className="h-full w-full text-sm text-justify overflow-y-scroll relative"
           placeholders={`Paste your JSON here...\nEg:
 {
   "category": "fiction",

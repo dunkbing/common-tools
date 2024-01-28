@@ -85,4 +85,5 @@
   color: rgba(255, 255, 255, 0.75);
   pointer-events: none;
   user-select: none;
+  opacity: 0.5;
 }
