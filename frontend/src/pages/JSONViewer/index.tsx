@@ -3,18 +3,17 @@ import { IconClipboard, IconCopy } from '@tabler/icons-react';
 import ReactJSON from '@microlink/react-json-view';
 import jsonPath from 'jsonpath';
 import { OnChange, OnMount, Editor, useMonaco } from '@monaco-editor/react';
-import { editor } from 'monaco-editor';
 import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
 
 import Button from '@/components/Button';
 import IconInput from '@/components/IconInput';
 import Dropdown, { Option } from '@/components/Dropdown';
 import sampleJson from './sample.json';
-import nordTheme from './nord.json';
 import CheatSheetDialog from './CheatSheetDialog';
 import { jsonViewerStyles } from '@/lib/constants';
-import EditorPlaceHolder from '@/components/EditorPlaceHolder';
-import { displayEditorPlaceholders } from '@/lib/utils';
+import EditorPlaceHolder, {
+  EditorPlaceHolderRef,
+} from '@/components/EditorPlaceHolder';
 
 const jsonViewerInputKey = 'json-viewer-input';
 
@@ -23,38 +22,27 @@ const JsonViewer: React.FC = () => {
   const [parseErr, setParseErr] = useState<Error | null>(null);
   const [indentWidth, setIndentWidth] = useState<number>(2);
 
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const editorRef = useRef<EditorPlaceHolderRef | null>(null);
   const parsedJsonRef = useRef<object>({});
 
-  const monaco = useMonaco();
-
-  useEffect(() => {
-    monaco?.editor.defineTheme('nord', nordTheme as any);
-    monaco?.editor.setTheme('nord');
-  }, [monaco]);
-
-  const handleEditorDidMount: OnMount = (editor, monaco) => {
-    displayEditorPlaceholders(true);
-    editor.focus();
-    editorRef.current = editor;
+  const handleEditorOnMount: OnMount = () => {
     const inputText = localStorage.getItem(jsonViewerInputKey);
     if (inputText) {
-      displayEditorPlaceholders(false);
       parseJson(inputText);
-      editorRef.current.focus();
-      editorRef.current.setValue(inputText);
+      editorRef.current?.focus();
+      editorRef.current?.setValue(inputText);
     }
   };
 
   const handleInputChange: OnChange = (value) => {
     parseJson(value);
-    displayEditorPlaceholders(!!!value);
   };
 
   const parseJson = (inputText?: string) => {
     if (!inputText) {
       setParsedJson({});
       setParseErr(null);
+      localStorage.setItem(jsonViewerInputKey, '');
       return;
     }
 
@@ -157,6 +145,8 @@ const JsonViewer: React.FC = () => {
           </div>
         </div>
         <EditorPlaceHolder
+          language="json"
+          ref={editorRef}
           className="h-full w-full text-sm text-justify overflow-y-scroll relative"
           placeholders={`Paste your JSON here...\nEg:
 {
@@ -166,24 +156,9 @@ const JsonViewer: React.FC = () => {
   "price": 11.59
 }
 `}
-        >
-          <Editor
-            height="100%"
-            language="json"
-            theme="nord"
-            onChange={handleInputChange}
-            onMount={handleEditorDidMount}
-            options={{
-              minimap: {
-                enabled: false,
-              },
-              scrollBeyondLastLine: false,
-              renderLineHighlight: 'none',
-              tabSize: indentWidth,
-            }}
-            keepCurrentModel
-          />
-        </EditorPlaceHolder>
+          handleEditorOnMount={handleEditorOnMount}
+          handleInputChange={handleInputChange}
+        />
       </div>
       <div className="h-5/6 w-1/2">
         <div className="mb-3 flex flex-row items-center justify-between">
