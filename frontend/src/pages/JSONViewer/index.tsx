@@ -126,7 +126,7 @@ const JsonViewer: React.FC = () => {
       <div className="h-5/6 w-1/2">
         <div className="mb-3 flex flex-row items-center justify-between">
           <Label className="font-semibold text-sm">Input</Label>
-          <div className="flex flex-row gap-1.5 items-center">
+          <div className="flex flex-row gap-1 items-center">
             <Button onClick={handlePaste} className="gap-1" size="sm">
               Clipboard
               <IconClipboard size={16} />
@@ -163,7 +163,7 @@ const JsonViewer: React.FC = () => {
           <div className="flex flex-row items-center gap-3">
             <label className="font-semibold text-sm">Formatted JSON</label>
             <Select onValueChange={changeSpaces}>
-              <SelectTrigger className="w-fit bg-slate-900 border-none">
+              <SelectTrigger className="w-fit bg-slate-900 border-none h-9">
                 <SelectValue placeholder="2 spaces">
                   {indentWidth} spaces
                 </SelectValue>
@@ -175,13 +175,6 @@ const JsonViewer: React.FC = () => {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            {/* <Dropdown
-              onChange={changeSpaces}
-              options={[
-                { label: '2 spaces', value: '2' },
-                { label: '4 spaces', value: '4' },
-              ]}
-            /> */}
           </div>
           <div className="flex flex-row gap-2 items-center">
             <Button onClick={handleCopy} size="sm" className="gap-1">

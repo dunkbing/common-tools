@@ -47,7 +47,7 @@ export const menus = {
     title: 'JWT',
     icon: <IconJwt size={23} />,
   },
-  html: {
+  htmlViewer: {
     title: 'HTML Viewer',
     icon: <IconFileTypeHtml />,
   },
@@ -71,7 +71,7 @@ export const menuSlugs = {
   base64Image: convertToSlug(menus.base64Image.title),
   url: convertToSlug(menus.url.title),
   jwt: convertToSlug(menus.jwt.title),
-  html: convertToSlug(menus.html.title),
+  htmlViewer: convertToSlug(menus.htmlViewer.title),
   yaml: convertToSlug(menus.yaml.title),
   json: convertToSlug(menus.json.title),
   svgViewer: convertToSlug(menus.svgViewer.title),
