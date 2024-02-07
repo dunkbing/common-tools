@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { editor } from 'monaco-editor';
 
-import nordTheme from '../pages/JSONViewer/nord.json';
+import nordTheme from '@/assets/nord.json';
 import { displayEditorPlaceholders } from '@/lib/utils';
 import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
 

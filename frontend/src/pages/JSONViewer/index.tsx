@@ -7,7 +7,7 @@ import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
 import { Minify } from '$wailsjs/go/main/App';
 
 import IconInput from '@/components/IconInput';
-import sampleJson from './sample.json';
+import sampleJson from '@/assets/sample.json';
 import CheatSheetDialog from './CheatSheetDialog';
 import { jsonViewerStyles } from '@/lib/constants';
 import EditorPlaceHolder, {

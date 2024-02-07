@@ -1,4 +1,4 @@
-import sampleJson from './sample.json';
+import sampleJson from '@/assets/sample.json';
 import { BrowserOpenURL } from '$wailsjs/runtime/runtime';
 
 const expressions = [
