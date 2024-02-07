@@ -15,16 +15,9 @@ import EditorPlaceHolder, {
 } from '@/components/EditorPlaceHolder';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectTrigger,
-  SelectValue,
-  SelectItem,
-} from '@/components/ui/select';
 import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
 import { useToast } from '@/components/ui/use-toast';
+import IndentSelection from '@/components/IndentSelection';
 
 const jsonViewerInputKey = 'json-viewer-input';
 
@@ -130,6 +123,10 @@ const JsonViewer: React.FC = () => {
     formatJson(newIndent);
   };
 
+  const onChangeIndent = (value: number): void => {
+    formatJson(value);
+  };
+
   return (
     <div className="flex flex-row p-8 w-full gap-4" style={{ height: '90%' }}>
       <div className="h-full w-1/2">
@@ -171,19 +168,7 @@ const JsonViewer: React.FC = () => {
         <div className="mb-3 flex flex-row items-center justify-between">
           <div className="flex flex-row items-center gap-3">
             <label className="font-semibold text-sm">Formatted JSON</label>
-            <Select onValueChange={changeSpaces}>
-              <SelectTrigger className="w-fit bg-slate-900 border-none h-9">
-                <SelectValue placeholder={`${indent} spaces`}>
-                  {indent} spaces
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent className="">
-                <SelectGroup>
-                  <SelectItem value="2">2 spaces</SelectItem>
-                  <SelectItem value="4">4 spaces</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <IndentSelection onChangeIndent={onChangeIndent} />
           </div>
           <div className="flex flex-row gap-2 items-center">
             <Button onClick={handleCopy} size="sm" className="gap-1">

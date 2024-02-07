@@ -9,6 +9,15 @@ body {
   overflow: hidden;
 }
 
+button,
+label,
+input,
+.monaco-editor {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
