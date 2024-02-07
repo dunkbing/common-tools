@@ -1,16 +1,22 @@
 import { Editor, OnChange, OnMount, useMonaco } from '@monaco-editor/react';
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import {
+  forwardRef,
+  useContext,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import { editor } from 'monaco-editor';
 
 import nordTheme from '../pages/JSONViewer/nord.json';
 import { displayEditorPlaceholders } from '@/lib/utils';
+import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
 
 type Props = {
   placeholders?: string;
   className?: string;
   handleInputChange?: OnChange;
   handleEditorOnMount?: OnMount;
-  indentWidth?: number;
   language?: string;
 };
 
@@ -24,6 +30,8 @@ const EditorPlaceHolder = forwardRef<EditorPlaceHolderRef, Props>(
   ({ className, ...props }, ref) => {
     const monaco = useMonaco();
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+    const { indent } = useContext(IndentContext) as IndentContextType;
+    console.log('EditorPlaceHolder', indent);
 
     useImperativeHandle(ref, () => {
       return {
@@ -72,7 +80,7 @@ const EditorPlaceHolder = forwardRef<EditorPlaceHolderRef, Props>(
             },
             scrollBeyondLastLine: false,
             renderLineHighlight: 'none',
-            tabSize: props.indentWidth || 2,
+            tabSize: indent,
           }}
           keepCurrentModel
         />

@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext, useEffect } from 'react';
 import { IconClipboard, IconCopy } from '@tabler/icons-react';
 import ReactJSON from '@microlink/react-json-view';
 import jsonPath from 'jsonpath';
@@ -23,24 +23,27 @@ import {
   SelectValue,
   SelectItem,
 } from '@/components/ui/select';
+import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
+import { useToast } from '@/components/ui/use-toast';
 
 const jsonViewerInputKey = 'json-viewer-input';
 
 const JsonViewer: React.FC = () => {
   const [parsedJson, setParsedJson] = useState<object>({});
   const [parseErr, setParseErr] = useState<Error | null>(null);
-  const [indentWidth, setIndentWidth] = useState<number>(2);
+  const { indent, setIndent } = useContext(IndentContext) as IndentContextType;
 
   const editorRef = useRef<EditorPlaceHolderRef | null>(null);
   const parsedJsonRef = useRef<object>({});
+  const { toast } = useToast();
 
   const handleEditorOnMount: OnMount = () => {
     const inputText = localStorage.getItem(jsonViewerInputKey);
     if (inputText) {
       parseJson(inputText);
-      editorRef.current?.focus();
       editorRef.current?.setValue(inputText);
     }
+    formatJson(indent);
   };
 
   const handleInputChange: OnChange = (value) => {
@@ -67,11 +70,15 @@ const JsonViewer: React.FC = () => {
   };
 
   const formatJson = (indentWidth: number) => {
-    const parsedJson = JSON.parse(editorRef.current?.getValue() || '');
-    const formattedJson = JSON.stringify(parsedJson, null, indentWidth);
-    if (!editorRef.current) return;
-    editorRef.current.focus();
-    editorRef.current.setValue(formattedJson);
+    try {
+      const parsedJson = JSON.parse(editorRef.current?.getValue() || '');
+      const formattedJson = JSON.stringify(parsedJson, null, indentWidth);
+      if (!editorRef.current) return;
+      editorRef.current.focus();
+      editorRef.current.setValue(formattedJson);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handlePaste = async () => {
@@ -95,13 +102,14 @@ const JsonViewer: React.FC = () => {
   const useSampleJson = () => {
     if (!editorRef.current) return;
     editorRef.current.focus();
-    editorRef.current.setValue(JSON.stringify(sampleJson, null, indentWidth));
-    parseJson(JSON.stringify(sampleJson, null, indentWidth));
+    editorRef.current.setValue(JSON.stringify(sampleJson, null, indent));
+    parseJson(JSON.stringify(sampleJson, null, indent));
   };
 
-  const handleCopy = () => {
-    const text = JSON.stringify(parsedJson, null, indentWidth);
-    ClipboardSetText(text);
+  const handleCopy = async () => {
+    const text = JSON.stringify(parsedJson, null, indent);
+    const success = await ClipboardSetText(text);
+    success && toast({ title: 'Copied to clipboard ✅', duration: 800 });
   };
 
   const queryJson = (query: string) => {
@@ -117,9 +125,9 @@ const JsonViewer: React.FC = () => {
   };
 
   const changeSpaces = (value: string): void => {
-    const newIndentWidth = Number(value);
-    setIndentWidth(newIndentWidth);
-    formatJson(newIndentWidth);
+    const newIndent = Number(value);
+    setIndent(newIndent);
+    formatJson(newIndent);
   };
 
   return (
@@ -132,7 +140,7 @@ const JsonViewer: React.FC = () => {
               Clipboard
               <IconClipboard size={16} />
             </Button>
-            <Button onClick={() => formatJson(indentWidth)} size="sm">
+            <Button onClick={() => formatJson(indent)} size="sm">
               Format
             </Button>
             <Button onClick={minifyJson} size="sm">
@@ -165,8 +173,8 @@ const JsonViewer: React.FC = () => {
             <label className="font-semibold text-sm">Formatted JSON</label>
             <Select onValueChange={changeSpaces}>
               <SelectTrigger className="w-fit bg-slate-900 border-none h-9">
-                <SelectValue placeholder="2 spaces">
-                  {indentWidth} spaces
+                <SelectValue placeholder={`${indent} spaces`}>
+                  {indent} spaces
                 </SelectValue>
               </SelectTrigger>
               <SelectContent className="">
@@ -202,7 +210,7 @@ const JsonViewer: React.FC = () => {
                 theme="monokai"
                 src={parsedJson}
                 onEdit={false}
-                indentWidth={indentWidth}
+                indentWidth={indent}
                 style={jsonViewerStyles}
                 quotesOnKeys={false}
                 name={null}

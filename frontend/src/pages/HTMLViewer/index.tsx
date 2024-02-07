@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { IconClipboard, IconCopy } from '@tabler/icons-react';
 import { OnChange, OnMount } from '@monaco-editor/react';
 import beautify from 'js-beautify';
@@ -17,26 +17,28 @@ import {
 } from '@/components/ui/select';
 import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
 import { Minify } from '$wailsjs/go/main/App';
+import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
+import { useToast } from '@/components/ui/use-toast';
 
 const htmlViewerInputKey = 'html-viewer-input';
 
 const HTMLViewer: React.FC = () => {
   const [htmlText, setHtmlText] = useState<string>();
+  const { indent, setIndent } = useContext(IndentContext) as IndentContextType;
   const editorRef = useRef<EditorPlaceHolderRef | null>(null);
-
-  useEffect(() => {}, [htmlText]);
+  const { toast } = useToast();
 
   const parseHtml = (text = '') => {
     setHtmlText(text);
     localStorage.setItem(htmlViewerInputKey, text);
   };
 
-  const handleEditorOnMount: OnMount = () => {
+  const handleEditorOnMount: OnMount = (editor, monaco) => {
     const inputText = localStorage.getItem(htmlViewerInputKey);
     if (inputText) {
-      setHtmlText(inputText);
-      editorRef.current?.focus();
+      parseHtml(inputText);
       editorRef.current?.setValue(inputText);
+      formatHtml(indent);
     }
   };
 
@@ -52,10 +54,10 @@ const HTMLViewer: React.FC = () => {
     parseHtml(clipboardText);
   };
 
-  const formatHtml = (indentWidth: number) => {
+  const formatHtml = (indent: number) => {
     const text = editorRef.current?.getValue() || '';
     const formattedHtml = beautify.html(text, {
-      indent_size: indentWidth,
+      indent_size: indent,
       indent_char: ' ',
       indent_with_tabs: false,
       preserve_newlines: true,
@@ -68,6 +70,7 @@ const HTMLViewer: React.FC = () => {
     if (!editorRef.current) return;
     editorRef.current.focus();
     editorRef.current.setValue(formattedHtml);
+    localStorage.setItem(htmlViewerInputKey, formattedHtml);
   };
 
   const minifyHtml = async () => {
@@ -78,9 +81,10 @@ const HTMLViewer: React.FC = () => {
     editorRef.current.setValue(minifiedHtml);
   };
 
-  const handleCopy = () => {
+  const handleCopy = async () => {
     const text = editorRef.current?.getValue() || '';
-    ClipboardSetText(text);
+    const success = await ClipboardSetText(text);
+    success && toast({ title: 'Copied to clipboard ✅', duration: 800 });
   };
 
   const useSampleHtml = () => {
@@ -100,6 +104,12 @@ const HTMLViewer: React.FC = () => {
     parseHtml(sample);
   };
 
+  const changeSpaces = (value: string): void => {
+    const newIndentWidth = Number(value);
+    setIndent(newIndentWidth);
+    formatHtml(newIndentWidth);
+  };
+
   return (
     <div className="flex flex-col p-8 w-full h-full gap-3">
       <div className="flex flex-row items-center px-4 justify-between">
@@ -108,7 +118,7 @@ const HTMLViewer: React.FC = () => {
             Clipboard
             <IconClipboard size={16} />
           </Button>
-          <Button size="sm" onClick={() => formatHtml(2)}>
+          <Button size="sm" onClick={() => formatHtml(indent)}>
             Format
           </Button>
           <Button size="sm" onClick={minifyHtml}>
@@ -120,10 +130,10 @@ const HTMLViewer: React.FC = () => {
           <Button size="sm" onClick={handleCopy}>
             Copy <IconCopy size={16} />
           </Button>
-          <Select>
+          <Select onValueChange={changeSpaces}>
             <SelectTrigger className="w-fit bg-slate-900 border-none h-9">
-              <SelectValue placeholder="2 spaces">
-                {/* {indentWidth} spaces */}
+              <SelectValue placeholder={`${indent} spaces`}>
+                {indent} spaces
               </SelectValue>
             </SelectTrigger>
             <SelectContent className="">

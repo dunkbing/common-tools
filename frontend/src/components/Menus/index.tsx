@@ -100,8 +100,8 @@ export default function Menus() {
     'aria-selected:bg-slate-800 aria-selected:text-white hover:cursor-pointer';
 
   return (
-    <div className="w-full h-screen m-auto py-4 px-3 bg-slate-800 opacity-85">
-      <Command className="text-slate-50 bg-slate-800">
+    <div className="w-full h-screen m-auto py-4 px-3 bg-gradient-to-r from-slate-900 to-gray-800 opacity-85">
+      <Command className="text-slate-50 bg-inherit">
         <CommandInput className="text-slate-200" placeholder="Search..." />
         <CommandList className="max-h-screen mb-2">
           <CommandEmpty>No results found.</CommandEmpty>

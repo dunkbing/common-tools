@@ -10,6 +10,7 @@ import SvgViewer from './pages/SvgViewer';
 import UrlEncodeDecode from './pages/UrlEncodeDecode';
 import HTMLViewer from './pages/HTMLViewer';
 import Composerize from './pages/Composerize';
+import IndentProvider from './contexts/IndentContext';
 
 function App() {
   const [width, setWidth] = useState(320);
