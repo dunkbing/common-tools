@@ -9,7 +9,6 @@ import {
 import { editor } from 'monaco-editor';
 
 import nordTheme from '@/assets/nord.json';
-import { displayEditorPlaceholders } from '@/lib/utils';
 import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
 
 type Props = {
@@ -18,6 +17,7 @@ type Props = {
   handleInputChange?: OnChange;
   handleEditorOnMount?: OnMount;
   language?: string;
+  readOnly?: boolean;
 };
 
 export type EditorPlaceHolderRef = {
@@ -30,8 +30,8 @@ const EditorPlaceHolder = forwardRef<EditorPlaceHolderRef, Props>(
   ({ className, ...props }, ref) => {
     const monaco = useMonaco();
     const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+    const placeholderRef = useRef<HTMLDivElement | null>(null);
     const { indent } = useContext(IndentContext) as IndentContextType;
-    console.log('EditorPlaceHolder', indent);
 
     useImperativeHandle(ref, () => {
       return {
@@ -52,6 +52,11 @@ const EditorPlaceHolder = forwardRef<EditorPlaceHolderRef, Props>(
       monaco?.editor.setTheme('nord');
     }, [monaco]);
 
+    function displayEditorPlaceholders(on: boolean) {
+      if (!placeholderRef.current) return;
+      placeholderRef.current.style.display = on ? 'block' : 'none';
+    }
+
     const handleInputChange: OnChange = (value, e) => {
       displayEditorPlaceholders(!!!value);
       props.handleInputChange?.(value, e);
@@ -61,7 +66,8 @@ const EditorPlaceHolder = forwardRef<EditorPlaceHolderRef, Props>(
       editorRef.current = editor;
       editor.focus();
       props.handleEditorOnMount?.(editor, monaco);
-      if (!editor.getValue()) {
+      const value = editor.getValue();
+      if (!value) {
         displayEditorPlaceholders(true);
       }
     };
@@ -75,6 +81,7 @@ const EditorPlaceHolder = forwardRef<EditorPlaceHolderRef, Props>(
           onChange={handleInputChange}
           onMount={handleEditorOnMount}
           options={{
+            readOnly: props.readOnly,
             minimap: {
               enabled: false,
             },
@@ -84,7 +91,9 @@ const EditorPlaceHolder = forwardRef<EditorPlaceHolderRef, Props>(
           }}
           keepCurrentModel
         />
-        <div className="monaco-placeholder">{props.placeholders}</div>
+        <div ref={placeholderRef} className="monaco-placeholder">
+          {props.placeholders}
+        </div>
       </div>
     );
   }
