@@ -10,7 +10,7 @@ import SvgViewer from './pages/SvgViewer';
 import UrlEncodeDecode from './pages/UrlEncodeDecode';
 import HTMLViewer from './pages/HTMLViewer';
 import Composerize from './pages/Composerize';
-import IndentProvider from './contexts/IndentContext';
+import JSONTransformer from './pages/JSONTransformer';
 
 function App() {
   const [width, setWidth] = useState(320);
@@ -34,6 +34,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to={menuSlugs.jsonViewer} />} />
             <Route path={menuSlugs.jsonViewer} element={<JSONViewer />} />
+            <Route
+              path={menuSlugs.jsonTransformer}
+              element={<JSONTransformer />}
+            />
             <Route path={menuSlugs.base64} element={<Base64 />} />
             <Route path={menuSlugs.url} element={<UrlEncodeDecode />} />
             <Route path={menuSlugs.jwt} element={<Jwt />} />

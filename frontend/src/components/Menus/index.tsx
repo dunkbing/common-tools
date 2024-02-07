@@ -31,6 +31,10 @@ export const menus = {
     title: 'JSON Viewer',
     icon: <IconCodeAsterix />,
   },
+  jsonTransformer: {
+    title: 'JSON Transformer',
+    icon: <IconTransform />,
+  },
   base64: {
     title: 'Base64 String Encode/Decode',
     icon: <IconBase64 size={23} />,
@@ -55,10 +59,6 @@ export const menus = {
     title: 'YAML to JSON',
     icon: <IconTransform />,
   },
-  json: {
-    title: 'JSON to YAML',
-    icon: <IconTransform />,
-  },
   svgViewer: {
     title: 'SVG Viewer',
     icon: <IconFileTypeSvg />,
@@ -71,13 +71,13 @@ export const menus = {
 
 export const menuSlugs = {
   jsonViewer: convertToSlug(menus.jsonViewer.title),
+  jsonTransformer: convertToSlug(menus.jsonTransformer.title),
   base64: convertToSlug(menus.base64.title),
   base64Image: convertToSlug(menus.base64Image.title),
   url: convertToSlug(menus.url.title),
   jwt: convertToSlug(menus.jwt.title),
   htmlViewer: convertToSlug(menus.htmlViewer.title),
   yaml: convertToSlug(menus.yaml.title),
-  json: convertToSlug(menus.json.title),
   svgViewer: convertToSlug(menus.svgViewer.title),
   composerize: convertToSlug(menus.composerize.title),
 };
