@@ -2,11 +2,11 @@ import React, { useState, useRef } from 'react';
 import { IconClipboard, IconCopy } from '@tabler/icons-react';
 import ReactJSON from '@microlink/react-json-view';
 import jsonPath from 'jsonpath';
-import { OnChange, OnMount, Editor, useMonaco } from '@monaco-editor/react';
+import { OnChange, OnMount } from '@monaco-editor/react';
 import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
+import { Minify } from '$wailsjs/go/main/App';
 
 import IconInput from '@/components/IconInput';
-import Dropdown, { Option } from '@/components/Dropdown';
 import sampleJson from './sample.json';
 import CheatSheetDialog from './CheatSheetDialog';
 import { jsonViewerStyles } from '@/lib/constants';
@@ -19,7 +19,6 @@ import {
   Select,
   SelectContent,
   SelectGroup,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
   SelectItem,
@@ -83,9 +82,11 @@ const JsonViewer: React.FC = () => {
     parseJson(clipboardText);
   };
 
-  const minifyJson = () => {
-    const parsedJson = JSON.parse(editorRef.current?.getValue() || '');
-    const minifiedJson = JSON.stringify(parsedJson);
+  const minifyJson = async () => {
+    const minifiedJson = await Minify(
+      'text/json',
+      editorRef.current?.getValue() || ''
+    );
     if (!editorRef.current) return;
     editorRef.current.focus();
     editorRef.current.setValue(minifiedJson);
@@ -122,8 +123,8 @@ const JsonViewer: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-row pb-8 px-8 w-full h-full items-center justify-center gap-8">
-      <div className="h-5/6 w-1/2">
+    <div className="flex flex-row p-8 w-full gap-4" style={{ height: '90%' }}>
+      <div className="h-full w-1/2">
         <div className="mb-3 flex flex-row items-center justify-between">
           <Label className="font-semibold text-sm">Input</Label>
           <div className="flex flex-row gap-1 items-center">
@@ -158,7 +159,7 @@ const JsonViewer: React.FC = () => {
           handleInputChange={handleInputChange}
         />
       </div>
-      <div className="h-5/6 w-1/2">
+      <div className="h-full w-1/2">
         <div className="mb-3 flex flex-row items-center justify-between">
           <div className="flex flex-row items-center gap-3">
             <label className="font-semibold text-sm">Formatted JSON</label>
@@ -194,7 +195,7 @@ const JsonViewer: React.FC = () => {
           <div
             className={`border ${
               !parseErr ? 'border-gray-300' : 'border-red-500 text-red-500'
-            } rounded-md bg-gray-300 pl-3 py-2 w-full h-full overflow-y-scroll`}
+            } rounded-md bg-gray-300 w-full h-full overflow-y-scroll`}
           >
             {!parseErr ? (
               <ReactJSON

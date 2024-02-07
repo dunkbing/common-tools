@@ -63,6 +63,10 @@ export const menus = {
     title: 'SVG Viewer',
     icon: <IconFileTypeSvg />,
   },
+  composerize: {
+    title: 'Composerize',
+    icon: <IconCodeAsterix />,
+  },
 };
 
 export const menuSlugs = {
@@ -75,6 +79,7 @@ export const menuSlugs = {
   yaml: convertToSlug(menus.yaml.title),
   json: convertToSlug(menus.json.title),
   svgViewer: convertToSlug(menus.svgViewer.title),
+  composerize: convertToSlug(menus.composerize.title),
 };
 
 export type Menu = keyof typeof menus;
@@ -95,7 +100,7 @@ export default function Menus() {
     'aria-selected:bg-slate-800 aria-selected:text-white hover:cursor-pointer';
 
   return (
-    <div className="w-full h-screen m-auto py-4 px-3 bg-slate-800 opacity-90">
+    <div className="w-full h-screen m-auto py-4 px-3 bg-slate-800 opacity-85">
       <Command className="text-slate-50 bg-slate-800">
         <CommandInput className="text-slate-200" placeholder="Search..." />
         <CommandList className="max-h-screen mb-2">

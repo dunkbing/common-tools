@@ -5,3 +5,7 @@
 export function Greet(arg1) {
   return window['go']['main']['App']['Greet'](arg1);
 }
+
+export function Minify(arg1, arg2) {
+  return window['go']['main']['App']['Minify'](arg1, arg2);
+}

@@ -9,6 +9,7 @@ import JSONViewer from './pages/JSONViewer';
 import SvgViewer from './pages/SvgViewer';
 import UrlEncodeDecode from './pages/UrlEncodeDecode';
 import HTMLViewer from './pages/HTMLViewer';
+import Composerize from './pages/Composerize';
 
 function App() {
   const [width, setWidth] = useState(320);
@@ -28,7 +29,7 @@ function App() {
         >
           <Menus />
         </Resizable>
-        <div className="bg-zinc-700 w-full max-h-screen font-mono">
+        <div className="w-full max-h-screen font-mono app">
           <Routes>
             <Route path="/" element={<Navigate to={menuSlugs.jsonViewer} />} />
             <Route path={menuSlugs.jsonViewer} element={<JSONViewer />} />
@@ -37,6 +38,7 @@ function App() {
             <Route path={menuSlugs.jwt} element={<Jwt />} />
             <Route path={menuSlugs.htmlViewer} element={<HTMLViewer />} />
             <Route path={menuSlugs.svgViewer} element={<SvgViewer />} />
+            <Route path={menuSlugs.composerize} element={<Composerize />} />
           </Routes>
         </div>
       </div>
