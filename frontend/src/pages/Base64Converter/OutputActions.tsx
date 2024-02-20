@@ -1,5 +1,6 @@
+import { Copy, CornerRightUp } from 'lucide-react';
+
 import Button from '@/components/Button';
-import { IconCopy, IconCornerRightUpDouble } from '@tabler/icons-react';
 
 interface OutputActionsProps {
   handleCopy: () => void;
@@ -19,14 +20,14 @@ export default function OutputActions({
           className="flex flex-row items-center gap-1"
         >
           Copy
-          <IconCopy size={16} />
+          <Copy size={16} />
         </Button>
         <Button
           onClick={handleUseAsInput}
           className="flex flex-row items-center gap-1"
         >
           Use as input
-          <IconCornerRightUpDouble size={16} />
+          <CornerRightUp size={16} />
         </Button>
       </div>
     </div>

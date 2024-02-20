@@ -1,5 +1,5 @@
-import React, { useState, useRef, useContext, useEffect } from 'react';
-import { IconClipboard, IconCopy } from '@tabler/icons-react';
+import React, { useState, useRef, useContext } from 'react';
+import { Clipboard, Copy } from 'lucide-react';
 import { OnChange, OnMount } from '@monaco-editor/react';
 import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
 import json2ts from 'json-to-ts';
@@ -107,7 +107,7 @@ const JSONViewer: React.FC = () => {
           <div className="flex flex-row gap-1 items-center">
             <Button onClick={handlePaste} className="gap-1" size="sm">
               Clipboard
-              <IconClipboard size={16} />
+              <Clipboard size={16} />
             </Button>
             <Button onClick={() => formatJson(indent)} size="sm">
               Format
@@ -153,11 +153,11 @@ const JSONViewer: React.FC = () => {
         <div className="flex flex-row gap-2 items-center mb-3">
           <IndentSelection onChangeIndent={onChangeIndent} />
           <Button onClick={handleCopy} size="sm" className="gap-1">
-            Copy <IconCopy size={16} />
+            Copy <Copy size={16} />
           </Button>
         </div>
         <div
-          className={`flex flex-col gap-2 h-full max-h-full bg-slate-700 p-2 text-sm`}
+          className={`flex flex-col gap-2 h-full max-h-full bg-slate-700 p-2 text-sm rounded-md border border-gray-300`}
         >
           <Highlighter language="typescript" code={transformedJson} />
         </div>

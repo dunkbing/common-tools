@@ -1,16 +1,6 @@
-import {
-  IconLink,
-  IconCodeAsterix,
-  IconFileTypeHtml,
-  IconTransform,
-  IconPhoto,
-  IconFileTypeSvg,
-  IconUser,
-  IconMail,
-  IconSettings,
-} from '@tabler/icons-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Link, Braces, Code2, Replace, FileImage, Image } from 'lucide-react';
 
 import { convertToSlug } from '../../lib/strings';
 import IconJwt from '../../assets/icons/jwt';
@@ -29,11 +19,11 @@ import { CommandShortcut } from '../ui/command';
 export const menus = {
   jsonViewer: {
     title: 'JSON Viewer',
-    icon: <IconCodeAsterix />,
+    icon: <Braces />,
   },
   jsonTransformer: {
     title: 'JSON Transformer',
-    icon: <IconTransform />,
+    icon: <Replace />,
   },
   base64: {
     title: 'Base64 String Encode/Decode',
@@ -41,11 +31,11 @@ export const menus = {
   },
   base64Image: {
     title: 'Base64 Image Encode/Decode',
-    icon: <IconPhoto />,
+    icon: <FileImage />,
   },
   url: {
     title: 'URL Encode/Decode',
-    icon: <IconLink />,
+    icon: <Link />,
   },
   jwt: {
     title: 'JWT',
@@ -53,19 +43,19 @@ export const menus = {
   },
   htmlViewer: {
     title: 'HTML Viewer',
-    icon: <IconFileTypeHtml />,
+    icon: <Code2 />,
   },
   yaml: {
     title: 'YAML to JSON',
-    icon: <IconTransform />,
+    icon: <Replace />,
   },
   svgViewer: {
     title: 'SVG Viewer',
-    icon: <IconFileTypeSvg />,
+    icon: <Image />,
   },
   composerize: {
     title: 'Composerize',
-    icon: <IconCodeAsterix />,
+    icon: <Braces />,
   },
 };
 
@@ -125,17 +115,16 @@ export default function Menus() {
           <CommandSeparator />
           <CommandGroup heading="Others" className="text-slate-50 text-sm">
             <CommandItem>
-              <IconUser className="mr-2 h-4 w-4" />
               <span>Profile</span>
               <CommandShortcut>⌘P</CommandShortcut>
             </CommandItem>
             <CommandItem>
-              <IconMail className="mr-2 h-4 w-4" />
+              {/* <IconMail className="mr-2 h-4 w-4" /> */}
               <span>Mail</span>
               <CommandShortcut>⌘B</CommandShortcut>
             </CommandItem>
             <CommandItem>
-              <IconSettings className="mr-2 h-4 w-4" />
+              {/* <IconSettings className="mr-2 h-4 w-4" /> */}
               <span>Settings</span>
               <CommandShortcut>⌘S</CommandShortcut>
             </CommandItem>

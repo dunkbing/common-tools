@@ -1,5 +1,5 @@
-import React, { useState, useRef, useContext, useEffect } from 'react';
-import { IconClipboard, IconCopy } from '@tabler/icons-react';
+import React, { useState, useRef, useContext } from 'react';
+import { Clipboard, Copy } from 'lucide-react';
 import ReactJSON from '@microlink/react-json-view';
 import jsonPath from 'jsonpath';
 import { OnChange, OnMount } from '@monaco-editor/react';
@@ -135,7 +135,7 @@ const JsonViewer: React.FC = () => {
           <div className="flex flex-row gap-1 items-center">
             <Button onClick={handlePaste} className="gap-1" size="sm">
               Clipboard
-              <IconClipboard size={16} />
+              <Clipboard size={16} />
             </Button>
             <Button onClick={() => formatJson(indent)} size="sm">
               Format
@@ -172,7 +172,7 @@ const JsonViewer: React.FC = () => {
           </div>
           <div className="flex flex-row gap-2 items-center">
             <Button onClick={handleCopy} size="sm" className="gap-1">
-              Copy <IconCopy size={16} />
+              Copy <Copy size={16} />
             </Button>
           </div>
         </div>

@@ -1,5 +1,5 @@
 import { ChangeEvent } from 'react';
-import { IconClipboard } from '@tabler/icons-react';
+import { Clipboard } from 'lucide-react';
 
 import Button from '@/components/Button';
 
@@ -41,7 +41,7 @@ export default function InputActions({
           className="flex flex-row items-center gap-1"
         >
           Clipboard
-          <IconClipboard size={16} />
+          <Clipboard size={16} />
         </Button>
       </div>{' '}
     </div>

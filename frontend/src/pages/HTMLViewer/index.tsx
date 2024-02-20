@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { IconClipboard, IconCopy } from '@tabler/icons-react';
+import React, { useState, useRef, useContext } from 'react';
+import { Clipboard, Copy } from 'lucide-react';
 import { OnChange, OnMount } from '@monaco-editor/react';
 import beautify from 'js-beautify';
 
@@ -116,7 +116,7 @@ const HTMLViewer: React.FC = () => {
         <div className="flex flex-row gap-1 items-center">
           <Button onClick={handlePaste} size="sm" className="gap-1">
             Clipboard
-            <IconClipboard size={16} />
+            <Clipboard size={16} />
           </Button>
           <Button size="sm" onClick={() => formatHtml(indent)}>
             Format
@@ -128,7 +128,7 @@ const HTMLViewer: React.FC = () => {
             Sample
           </Button>
           <Button size="sm" onClick={handleCopy}>
-            Copy <IconCopy size={16} />
+            Copy <Copy size={16} />
           </Button>
           <Select onValueChange={changeSpaces}>
             <SelectTrigger className="w-fit bg-slate-900 border-none h-9">
