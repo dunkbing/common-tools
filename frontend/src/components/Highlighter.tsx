@@ -1,5 +1,5 @@
-import { FC } from 'react';
 import { Highlight, PrismTheme } from 'prism-react-renderer';
+import { FC } from 'react';
 
 const primer = {
   black: '#1b1f23',
@@ -189,7 +189,13 @@ const Highlighter: FC<HighLighterProps> = ({
       {({ className, style, tokens, getLineProps, getTokenProps }) => (
         <pre className={className}>
           {tokens.map((line, i) => (
-            <div {...getLineProps({ line, key: i })} key={i}>
+            <div
+              {...getLineProps({
+                line,
+                key: i,
+              })}
+              key={i}
+            >
               <div
                 key={i}
                 className="text-gray-300 select-none w-8 pr-3 inline-block text-right"
@@ -197,7 +203,13 @@ const Highlighter: FC<HighLighterProps> = ({
                 {i + 1}
               </div>
               {line.map((token, key) => (
-                <span {...getTokenProps({ token, key })} key={key} />
+                <span
+                  {...getTokenProps({
+                    token,
+                    key,
+                  })}
+                  key={key}
+                />
               ))}
             </div>
           ))}

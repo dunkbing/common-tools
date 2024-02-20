@@ -1,10 +1,19 @@
-import sampleJson from '@/assets/sample.json';
 import { BrowserOpenURL } from '$wailsjs/runtime/runtime';
+import sampleJson from '@/assets/sample.json';
 
 const expressions = [
-  { jsonPath: '$', description: 'the root object/element' },
-  { jsonPath: '@', description: 'the current object/element' },
-  { jsonPath: '. or []', description: 'child operator' },
+  {
+    jsonPath: '$',
+    description: 'the root object/element',
+  },
+  {
+    jsonPath: '@',
+    description: 'the current object/element',
+  },
+  {
+    jsonPath: '. or []',
+    description: 'child operator',
+  },
   {
     jsonPath: '..',
     description: 'recursive descent. JSONPath borrows this syntax from E4X.',
@@ -27,7 +36,10 @@ const expressions = [
     jsonPath: '[start:end:step]',
     description: 'array slice operator borrowed from ES4.',
   },
-  { jsonPath: '?()', description: 'applies a filter (script) expression.' },
+  {
+    jsonPath: '?()',
+    description: 'applies a filter (script) expression.',
+  },
   {
     jsonPath: '()',
     description: 'script expression, using the underlying script engine.',
@@ -57,7 +69,7 @@ const examples = [
     description: 'the third book',
   },
   {
-    jsonPath: `$..book[(@.length-1)]\n$..book[-1:]`,
+    jsonPath: '$..book[(@.length-1)]\n$..book[-1:]',
     description: 'the last book in order.',
   },
   {
@@ -83,17 +95,15 @@ const JSONPathCheatSheet = () => {
     <div className="h-80 text-zinc-100 shadow-lg">
       <h1 className="text-lg font-bold">JSONPath Expressions</h1>
       Reference :{' '}
-      <a
-        href="https://goessner.net/articles/JsonPath/"
-        target="_blank"
-        rel="noreferrer"
+      <button
+        type="button"
         className="text-blue-400 underline"
         onClick={() => {
           BrowserOpenURL('https://goessner.net/articles/JsonPath/');
         }}
       >
         https://goessner.net/articles/JsonPath/
-      </a>
+      </button>
       <table className="table-auto text-sm mt-2">
         <thead>
           <tr>
@@ -102,8 +112,8 @@ const JSONPathCheatSheet = () => {
           </tr>
         </thead>
         <tbody>
-          {expressions.map((row, index) => (
-            <tr key={index}>
+          {expressions.map((row) => (
+            <tr key={row.jsonPath}>
               <td className="py-2 px-4 border text-center">{row.jsonPath}</td>
               <td className="py-2 px-4 border">{row.description}</td>
             </tr>
@@ -122,8 +132,8 @@ const JSONPathCheatSheet = () => {
           </tr>
         </thead>
         <tbody>
-          {examples.map((row, index) => (
-            <tr key={index}>
+          {examples.map((row) => (
+            <tr key={row.jsonPath}>
               <td className="py-2 px-4 border">{row.jsonPath}</td>
               <td className="py-2 px-4 border">{row.description}</td>
             </tr>

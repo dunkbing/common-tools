@@ -48,7 +48,7 @@ const Composerize: React.FC = () => {
   };
 
   const handleEncodeDecodeChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setIsEncode(event.target.value === 'encode');
   };

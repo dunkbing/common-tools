@@ -18,10 +18,10 @@ const UrlEncodeDecode: React.FC = () => {
         const { current } = textAreaRef;
         if (current) {
           const { selectionStart, selectionEnd, value } = current;
-          const newValue =
-            value.substring(0, selectionStart) +
-            '    ' +
-            value.substring(selectionEnd);
+          const newValue = `${value.substring(
+            0,
+            selectionStart,
+          )}    ${value.substring(selectionEnd)}`;
           current.value = newValue;
           current.setSelectionRange(selectionStart + 4, selectionStart + 4);
         }
@@ -48,7 +48,7 @@ const UrlEncodeDecode: React.FC = () => {
   };
 
   const handleEncodeDecodeChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setIsEncode(event.target.value === 'encode');
   };

@@ -1,12 +1,14 @@
-import React, { useState, useRef, useContext } from 'react';
-import { Clipboard, Copy } from 'lucide-react';
 import { OnChange, OnMount } from '@monaco-editor/react';
 import beautify from 'js-beautify';
+import { Clipboard, Copy } from 'lucide-react';
+import React, { useState, useRef, useContext } from 'react';
 
-import { Button } from '@/components/ui/button';
+import { Minify } from '$wailsjs/go/main/App';
+import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
 import EditorPlaceHolder, {
   EditorPlaceHolderRef,
 } from '@/components/EditorPlaceHolder';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
@@ -15,10 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
-import { Minify } from '$wailsjs/go/main/App';
-import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
 import { useToast } from '@/components/ui/use-toast';
+import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
 
 const htmlViewerInputKey = 'html-viewer-input';
 
@@ -84,7 +84,11 @@ const HTMLViewer: React.FC = () => {
   const handleCopy = async () => {
     const text = editorRef.current?.getValue() || '';
     const success = await ClipboardSetText(text);
-    success && toast({ title: 'Copied to clipboard ✅', duration: 800 });
+    success &&
+      toast({
+        title: 'Copied to clipboard ✅',
+        duration: 800,
+      });
   };
 
   const useSampleHtml = () => {
@@ -160,6 +164,7 @@ const HTMLViewer: React.FC = () => {
         <div className="h-full w-1/2">
           <div className="h-full max-h-full border border-gray-300 bg-white text-black">
             <iframe
+              title="HTML Viewer"
               id="iFrameMD"
               src="data:text/html;charset=utf-8,"
               className="w-full h-full"

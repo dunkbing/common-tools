@@ -1,23 +1,23 @@
-import React, { useState, useRef, useContext } from 'react';
-import { Clipboard, Copy } from 'lucide-react';
-import ReactJSON from '@microlink/react-json-view';
-import jsonPath from 'jsonpath';
-import { OnChange, OnMount } from '@monaco-editor/react';
-import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
 import { Minify } from '$wailsjs/go/main/App';
+import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
+import ReactJSON from '@microlink/react-json-view';
+import { OnChange, OnMount } from '@monaco-editor/react';
+import jsonPath from 'jsonpath';
+import { Clipboard, Copy } from 'lucide-react';
+import React, { useState, useRef, useContext } from 'react';
 
-import IconInput from '@/components/IconInput';
 import sampleJson from '@/assets/sample.json';
-import CheatSheetDialog from './CheatSheetDialog';
-import { jsonViewerStyles } from '@/lib/constants';
 import EditorPlaceHolder, {
   EditorPlaceHolderRef,
 } from '@/components/EditorPlaceHolder';
+import IconInput from '@/components/IconInput';
+import IndentSelection from '@/components/IndentSelection';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
 import { useToast } from '@/components/ui/use-toast';
-import IndentSelection from '@/components/IndentSelection';
+import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
+import { jsonViewerStyles } from '@/lib/constants';
+import CheatSheetDialog from './CheatSheetDialog';
 
 const jsonViewerInputKey = 'json-viewer-input';
 
@@ -57,8 +57,8 @@ const JsonViewer: React.FC = () => {
       parsedJsonRef.current = parsedJson;
       setParseErr(null);
       localStorage.setItem(jsonViewerInputKey, inputText);
-    } catch (error: any) {
-      setParseErr(error);
+    } catch (error) {
+      setParseErr(error as Error);
     }
   };
 
@@ -85,7 +85,7 @@ const JsonViewer: React.FC = () => {
   const minifyJson = async () => {
     const minifiedJson = await Minify(
       'text/json',
-      editorRef.current?.getValue() || ''
+      editorRef.current?.getValue() || '',
     );
     if (!editorRef.current) return;
     editorRef.current.focus();
@@ -102,7 +102,11 @@ const JsonViewer: React.FC = () => {
   const handleCopy = async () => {
     const text = JSON.stringify(parsedJson, null, indent);
     const success = await ClipboardSetText(text);
-    success && toast({ title: 'Copied to clipboard ✅', duration: 800 });
+    success &&
+      toast({
+        title: 'Copied to clipboard ✅',
+        duration: 800,
+      });
   };
 
   const queryJson = (query: string) => {
@@ -115,12 +119,6 @@ const JsonViewer: React.FC = () => {
       setParsedJson(result);
       setParseErr(null);
     } catch (error: any) {}
-  };
-
-  const changeSpaces = (value: string): void => {
-    const newIndent = Number(value);
-    setIndent(newIndent);
-    formatJson(newIndent);
   };
 
   const onChangeIndent = (value: number): void => {
@@ -176,7 +174,7 @@ const JsonViewer: React.FC = () => {
             </Button>
           </div>
         </div>
-        <div className={`flex flex-col gap-2 h-full max-h-full`}>
+        <div className="flex flex-col gap-2 h-full max-h-full">
           <div className="flex flex-row gap-2 items-center">
             <IconInput
               className="text-sm bg-zinc-800"

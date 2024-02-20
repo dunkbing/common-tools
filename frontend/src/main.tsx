@@ -1,9 +1,9 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import './index.css';
-import IndentProvider from './contexts/IndentContext';
 import { Toaster } from './components/ui/toaster';
+import IndentProvider from './contexts/IndentContext';
+import './index.css';
 
 const container = document.getElementById('root');
 
@@ -15,5 +15,5 @@ root.render(
       <App />
     </IndentProvider>
     <Toaster />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

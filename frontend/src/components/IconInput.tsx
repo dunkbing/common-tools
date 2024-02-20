@@ -18,7 +18,7 @@ const IconInput = forwardRef<HTMLInputElement, InputProps>(
     ) : (
       <Input type={type} className={className} ref={ref} {...props} />
     );
-  }
+  },
 );
 
 export default IconInput;

@@ -1,5 +1,5 @@
-import { ChangeEvent } from 'react';
 import { Clipboard } from 'lucide-react';
+import { ChangeEvent } from 'react';
 
 import Button from '@/components/Button';
 

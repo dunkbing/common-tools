@@ -1,18 +1,16 @@
-import React, { useState, useRef, useContext } from 'react';
-import { Clipboard, Copy } from 'lucide-react';
-import { OnChange, OnMount } from '@monaco-editor/react';
 import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
+import { OnChange, OnMount } from '@monaco-editor/react';
 import json2ts from 'json-to-ts';
+import { Clipboard, Copy } from 'lucide-react';
+import React, { useState, useRef, useContext } from 'react';
 
 import EditorPlaceHolder, {
   EditorPlaceHolderRef,
 } from '@/components/EditorPlaceHolder';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
-import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
 import Highlighter from '@/components/Highlighter';
 import IndentSelection from '@/components/IndentSelection';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -21,6 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useToast } from '@/components/ui/use-toast';
+import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
 
 const jsonTransformInputKey = 'json-transformer-input';
 
@@ -48,7 +48,9 @@ const JSONViewer: React.FC = () => {
     if (!str) return;
     try {
       const obj = JSON.parse(str);
-      const code = json2ts(obj, { rootName: 'Root' });
+      const code = json2ts(obj, {
+        rootName: 'Root',
+      });
       setTransformedJson(code.join('\n'));
     } catch (error) {
       console.log(error);
@@ -92,7 +94,11 @@ const JSONViewer: React.FC = () => {
     const text = transformedJson;
     if (!text) return;
     const success = await ClipboardSetText(text);
-    success && toast({ title: 'Copied to clipboard ✅', duration: 800 });
+    success &&
+      toast({
+        title: 'Copied to clipboard ✅',
+        duration: 800,
+      });
   };
 
   const onChangeIndent = (value: number): void => {
@@ -157,7 +163,9 @@ const JSONViewer: React.FC = () => {
           </Button>
         </div>
         <div
-          className={`flex flex-col gap-2 h-full max-h-full bg-slate-700 p-2 text-sm rounded-md border border-gray-300`}
+          className={
+            'flex flex-col gap-2 h-full max-h-full bg-slate-700 p-2 text-sm rounded-md border border-gray-300'
+          }
         >
           <Highlighter language="typescript" code={transformedJson} />
         </div>

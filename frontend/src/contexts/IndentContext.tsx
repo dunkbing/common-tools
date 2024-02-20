@@ -12,12 +12,12 @@ export type IndentContextType = {
 };
 
 export const IndentContext = React.createContext<IndentContextType | null>(
-  null
+  null,
 );
 
-const IndentProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+const IndentProvider: React.FC<{
+  children: React.ReactNode;
+}> = ({ children }) => {
   const [indent, setIndent] = useState<number>(2);
 
   useEffect(() => {
@@ -33,7 +33,12 @@ const IndentProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <IndentContext.Provider value={{ indent, setIndent: changeIndent }}>
+    <IndentContext.Provider
+      value={{
+        indent,
+        setIndent: changeIndent,
+      }}
+    >
       {children}
     </IndentContext.Provider>
   );

@@ -1,7 +1,7 @@
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { HelpCircle } from 'lucide-react';
 import React from 'react';
 import JSONPathCheatSheet from './CheatSheet';
-import { HelpCircle } from 'lucide-react';
-import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 
 const HtmlDialog: React.FC = () => {
   return (

@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { JwtHeader, JwtPayload, jwtDecode } from 'jwt-decode';
 import ReactJSON from '@microlink/react-json-view';
+import { JwtHeader, JwtPayload, jwtDecode } from 'jwt-decode';
+import React, { useState, useEffect } from 'react';
 
-import { jsonViewerStyles } from '@/lib/constants';
 import { Textarea } from '@/components/ui/textarea';
+import { jsonViewerStyles } from '@/lib/constants';
 
 interface DecodedToken {
   header: JwtHeader;

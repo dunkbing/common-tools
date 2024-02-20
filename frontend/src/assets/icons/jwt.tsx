@@ -11,6 +11,7 @@ export default function IconJwt({ size = 40, color }: IconProps) {
       height={size}
       fill={color}
     >
+      <title>jwt</title>
       <polygon
         fill="#546e7a"
         points="21.906,31.772 24.507,29.048 27.107,31.772 27.107,43 21.906,43"

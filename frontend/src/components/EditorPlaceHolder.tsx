@@ -1,4 +1,5 @@
 import { Editor, OnChange, OnMount, useMonaco } from '@monaco-editor/react';
+import { editor } from 'monaco-editor';
 import {
   forwardRef,
   useContext,
@@ -6,7 +7,6 @@ import {
   useImperativeHandle,
   useRef,
 } from 'react';
-import { editor } from 'monaco-editor';
 
 import nordTheme from '@/assets/nord.json';
 import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
@@ -58,7 +58,7 @@ const EditorPlaceHolder = forwardRef<EditorPlaceHolderRef, Props>(
     }
 
     const handleInputChange: OnChange = (value, e) => {
-      displayEditorPlaceholders(!!!value);
+      displayEditorPlaceholders(!value);
       props.handleInputChange?.(value, e);
     };
 
@@ -96,7 +96,7 @@ const EditorPlaceHolder = forwardRef<EditorPlaceHolderRef, Props>(
         </div>
       </div>
     );
-  }
+  },
 );
 
 export default EditorPlaceHolder;

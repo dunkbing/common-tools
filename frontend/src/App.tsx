@@ -1,16 +1,16 @@
+import { Resizable } from 're-resizable';
 import { useState } from 'react';
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom';
-import { Resizable } from 're-resizable';
 
 import Menus, { menuSlugs } from './components/Menus';
 import Base64 from './pages/Base64Converter';
-import Jwt from './pages/JwtDecoder';
+import Composerize from './pages/Composerize';
+import HTMLViewer from './pages/HTMLViewer';
+import JSONTransformer from './pages/JSONTransformer';
 import JSONViewer from './pages/JSONViewer';
+import Jwt from './pages/JwtDecoder';
 import SvgViewer from './pages/SvgViewer';
 import UrlEncodeDecode from './pages/UrlEncodeDecode';
-import HTMLViewer from './pages/HTMLViewer';
-import Composerize from './pages/Composerize';
-import JSONTransformer from './pages/JSONTransformer';
 
 function App() {
   const [width, setWidth] = useState(320);
@@ -20,7 +20,10 @@ function App() {
       <div className="flex flex-row font-mono text-slate-100">
         <Resizable
           className="resizable"
-          size={{ width, height: '100%' }}
+          size={{
+            width,
+            height: '100%',
+          }}
           maxWidth={390}
           minWidth={250}
           enable={{ right: true }}

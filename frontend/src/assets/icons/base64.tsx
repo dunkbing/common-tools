@@ -13,6 +13,7 @@ const IconBase64 = ({ size = 40, color }: IconProps) => (
     height={size}
     fill={color}
   >
+    <title>base64</title>
     <rect width="100%" height="100%" fill="black" />
     <text
       x="50%"

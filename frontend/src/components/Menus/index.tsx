@@ -1,19 +1,19 @@
+import { Braces, Code2, FileImage, Image, Link, Replace } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Link, Braces, Code2, Replace, FileImage, Image } from 'lucide-react';
 
-import { convertToSlug } from '../../lib/strings';
-import IconJwt from '../../assets/icons/jwt';
-import IconBase64 from '../../assets/icons/base64';
 import {
   Command,
-  CommandInput,
-  CommandList,
   CommandEmpty,
   CommandGroup,
+  CommandInput,
   CommandItem,
+  CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
+import IconBase64 from '../../assets/icons/base64';
+import IconJwt from '../../assets/icons/jwt';
+import { convertToSlug } from '../../lib/strings';
 import { CommandShortcut } from '../ui/command';
 
 export const menus = {

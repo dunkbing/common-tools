@@ -1,10 +1,10 @@
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectGroup,
   SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/components/ui/select';
 import { IndentContext, IndentContextType } from '@/contexts/IndentContext';
 import { useContext } from 'react';

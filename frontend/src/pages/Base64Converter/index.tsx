@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 import { ClipboardGetText, ClipboardSetText } from '$wailsjs/runtime/runtime';
+import { Textarea } from '@/components/ui/textarea';
 import InputActions from './InputActions';
 import OutputActions from './OutputActions';
-import { Textarea } from '@/components/ui/textarea';
 
 const Base64Converter: React.FC = () => {
   const [outputText, setOutputText] = useState<string>('');
@@ -18,10 +18,10 @@ const Base64Converter: React.FC = () => {
         const { current } = textAreaRef;
         if (current) {
           const { selectionStart, selectionEnd, value } = current;
-          const newValue =
-            value.substring(0, selectionStart) +
-            '    ' +
-            value.substring(selectionEnd);
+          const newValue = `${value.substring(
+            0,
+            selectionStart,
+          )}    ${value.substring(selectionEnd)}`;
           current.value = newValue;
           current.setSelectionRange(selectionStart + 4, selectionStart + 4);
         }
@@ -41,12 +41,12 @@ const Base64Converter: React.FC = () => {
 
   const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setOutputText(
-      isEncode ? btoa(event.target.value) : atob(event.target.value)
+      isEncode ? btoa(event.target.value) : atob(event.target.value),
     );
   };
 
   const handleEncodeDecodeChange = (
-    event: React.ChangeEvent<HTMLInputElement>
+    event: React.ChangeEvent<HTMLInputElement>,
   ) => {
     setIsEncode(event.target.value === 'encode');
   };
