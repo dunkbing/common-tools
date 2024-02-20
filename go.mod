@@ -6,7 +6,7 @@ toolchain go1.21.5
 
 require github.com/wailsapp/wails/v2 v2.8.0
 
-require github.com/tdewolff/parse/v2 v2.7.11 // indirect
+require github.com/tdewolff/parse/v2 v2.7.12 // indirect
 
 require (
 	github.com/bep/debounce v1.2.1 // indirect
@@ -26,7 +26,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/samber/lo v1.38.1 // indirect
-	github.com/tdewolff/minify/v2 v2.20.16
+	github.com/tdewolff/minify/v2 v2.20.17
 	github.com/tkrajina/go-reflector v0.5.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
