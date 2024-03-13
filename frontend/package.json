@@ -19,7 +19,7 @@
     "@radix-ui/react-toast": "^1.1.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
-    "cmdk": "^0.2.1",
+    "cmdk": "^1.0.0",
     "composerize": "^1.6.6",
     "js-beautify": "^1.15.1",
     "json-to-ts": "^1.7.0",
