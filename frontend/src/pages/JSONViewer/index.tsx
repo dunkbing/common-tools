@@ -24,7 +24,7 @@ const jsonViewerInputKey = 'json-viewer-input';
 const JsonViewer: React.FC = () => {
   const [parsedJson, setParsedJson] = useState<object>({});
   const [parseErr, setParseErr] = useState<Error | null>(null);
-  const { indent, setIndent } = useContext(IndentContext) as IndentContextType;
+  const { indent } = useContext(IndentContext) as IndentContextType;
 
   const editorRef = useRef<EditorPlaceHolderRef | null>(null);
   const parsedJsonRef = useRef<object>({});

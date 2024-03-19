@@ -11,9 +11,9 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command';
+import { convertToSlug } from '@/lib/strings';
 import IconBase64 from '../../assets/icons/base64';
 import IconJwt from '../../assets/icons/jwt';
-import { convertToSlug } from '../../lib/strings';
 import { CommandShortcut } from '../ui/command';
 
 export const menus = {
@@ -45,6 +45,10 @@ export const menus = {
     title: 'HTML Viewer',
     icon: <Code2 />,
   },
+  htmlToMarkdown: {
+    title: 'HTML To Markdown',
+    icon: <Code2 />,
+  },
   yaml: {
     title: 'YAML to JSON',
     icon: <Replace />,
@@ -67,6 +71,7 @@ export const menuSlugs = {
   url: convertToSlug(menus.url.title),
   jwt: convertToSlug(menus.jwt.title),
   htmlViewer: convertToSlug(menus.htmlViewer.title),
+  htmlToMarkdown: convertToSlug(menus.htmlToMarkdown.title),
   yaml: convertToSlug(menus.yaml.title),
   svgViewer: convertToSlug(menus.svgViewer.title),
   composerize: convertToSlug(menus.composerize.title),
@@ -106,6 +111,7 @@ export default function Menus() {
                 className={`gap-2 font-semibold ${
                   selectedMenu === key ? selectedStyle : defaultStyle
                 }`}
+                value={menu.title}
               >
                 {menu.icon}
                 <span>{menu.title}</span>

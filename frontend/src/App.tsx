@@ -8,12 +8,12 @@ import Composerize from './pages/Composerize';
 import HTMLViewer from './pages/HTMLViewer';
 import JSONTransformer from './pages/JSONTransformer';
 import JSONViewer from './pages/JSONViewer';
-import Jwt from './pages/JwtDecoder';
+import Jwt from './pages/JwtDebugger';
 import SvgViewer from './pages/SvgViewer';
 import UrlEncodeDecode from './pages/UrlEncodeDecode';
 
 function App() {
-  const [width, setWidth] = useState(320);
+  const [width, setWidth] = useState(340);
 
   return (
     <HashRouter basename="/">
@@ -25,10 +25,10 @@ function App() {
             height: '100%',
           }}
           maxWidth={390}
-          minWidth={250}
+          minWidth={270}
           enable={{ right: true }}
-          onResizeStop={(e, direction, ref, d) => {
-            setWidth(width + d.width);
+          onResizeStop={(e, direction, ref, delta) => {
+            setWidth(width + delta.width);
           }}
         >
           <Menus />
@@ -45,6 +45,7 @@ function App() {
             <Route path={menuSlugs.url} element={<UrlEncodeDecode />} />
             <Route path={menuSlugs.jwt} element={<Jwt />} />
             <Route path={menuSlugs.htmlViewer} element={<HTMLViewer />} />
+            <Route path={menuSlugs.htmlToMarkdown} element={<HTMLViewer />} />
             <Route path={menuSlugs.svgViewer} element={<SvgViewer />} />
             <Route path={menuSlugs.composerize} element={<Composerize />} />
           </Routes>
