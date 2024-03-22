@@ -83,7 +83,6 @@ const JwtInput: React.FC<JWTInputProps> = (props) => {
       <CodeMirror
         className="h-full"
         value={props.token}
-        height="100%"
         width="100%"
         lang="jwt"
         onChange={editToken}

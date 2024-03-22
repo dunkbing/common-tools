@@ -33,7 +33,7 @@ function App() {
         >
           <Menus />
         </Resizable>
-        <div className="w-full max-h-screen font-mono app">
+        <div className="w-full max-h-screen font-mono app overscroll-none">
           <Routes>
             <Route path="/" element={<Navigate to={menuSlugs.jsonViewer} />} />
             <Route path={menuSlugs.jsonViewer} element={<JSONViewer />} />

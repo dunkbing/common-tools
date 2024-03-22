@@ -1,6 +1,7 @@
-import ReactJSON from '@microlink/react-json-view';
-import { JwtHeader, JwtPayload, jwtDecode } from 'jwt-decode';
-import React, { useState, useEffect, useMemo, useReducer } from 'react';
+import { json } from '@codemirror/legacy-modes/mode/javascript';
+import CodeMirror from '@uiw/react-codemirror';
+import * as jose from 'jose';
+import React, { useEffect, useMemo, useReducer, useState } from 'react';
 
 import { Label } from '@/components/ui/label';
 import {
@@ -11,37 +12,42 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { jsonViewerStyles } from '@/lib/constants';
+import { LanguageSupport, StreamLanguage } from '@codemirror/language';
+import { EditorView } from 'codemirror';
+import { JWTHeaderParameters, JWTPayload } from 'jose';
 import JwtInput from './JwtInput';
 
-export type SymmetricType = 'HS256' | 'HS384' | 'HS512';
+const symmetricTypes = ['HS256', 'HS384', 'HS512'] as const;
+export type SymmetricType = (typeof symmetricTypes)[number];
 
-export type AsymmetricType =
-  | 'RS256'
-  | 'RS384'
-  | 'RS512'
-  | 'ES256'
-  | 'ES384'
-  | 'ES512'
-  | 'PS256'
-  | 'PS384'
-  | 'PS512';
+const asymmetricTypes = [
+  'RS256',
+  'RS384',
+  'RS512',
+  'ES256',
+  'ES384',
+  'ES512',
+  'PS256',
+  'PS384',
+  'PS512',
+] as const;
+export type AsymmetricType = (typeof asymmetricTypes)[number];
 
 export type AlgorithmType = SymmetricType | AsymmetricType;
 
 const fullTypeNames: Record<AlgorithmType, string> = {
-  HS256: 'HMAC SHA-256`',
-  HS384: 'HMAC SHA-384`',
-  HS512: 'HMAC SHA-512`',
-  RS256: 'RSA SHA-256`',
-  RS384: 'RSA SHA-384`',
-  RS512: 'RSA SHA-512`',
-  ES256: 'ECDSA SHA-256`',
-  ES384: 'ECDSA SHA-384`',
-  ES512: 'ECDSA SHA-512`',
-  PS256: 'RSA-PSS SHA-256`',
-  PS384: 'RSA-PSS SHA-384`',
-  PS512: 'RSA-PSS SHA-51',
+  HS256: 'HMAC SHA-256',
+  HS384: 'HMAC SHA-384',
+  HS512: 'HMAC SHA-512',
+  RS256: 'RSA SHA-256',
+  RS384: 'RSA SHA-384',
+  RS512: 'RSA SHA-512',
+  ES256: 'ECDSA SHA-256',
+  ES384: 'ECDSA SHA-384',
+  ES512: 'ECDSA SHA-512',
+  PS256: 'RSA-PSS SHA-256',
+  PS384: 'RSA-PSS SHA-384',
+  PS512: 'RSA-PSS SHA-512',
 };
 
 const publicKey = `-----BEGIN PUBLIC KEY-----
@@ -105,17 +111,17 @@ const secrets: Record<
   PS512: { publicKey, privateKey },
 };
 
-const SymmetricSignature: React.FC<{ type: SymmetricType }> = ({ type }) => {
-  const secret = `your-${type}-bit-secret`;
+const defaultSecret = 'your-256-bit-secret';
 
+const SymmetricSignature: React.FC<{ type: SymmetricType }> = ({ type }) => {
   return (
-    <pre className="border p-4 rounded-md bg-gray-800 flex flex-col gap-1 text-blue-300">
+    <pre className="border p-4 rounded-md bg-gray-800 flex flex-col gap-1 text-blue-300 text-xs">
       <span className="font-semibold">{fullTypeNames[type]}(</span>
       <span className="ml-5">base64UrlEncode(header) + "." +</span>
       <span className="ml-5">base64UrlEncode(payload),</span>
       <input
         name="secret"
-        defaultValue={secret}
+        defaultValue={defaultSecret}
         className="border rounded-md px-2 py-1 focus:outline-none focus:ring focus:border-blue-300 ml-5"
         data-tippy=""
         data-original-title="Weak secret!"
@@ -143,7 +149,7 @@ const AsymmetricSignature: React.FC<{ type: AsymmetricType }> = ({ type }) => {
   };
 
   return (
-    <pre className="border p-4 rounded-md bg-gray-800 flex flex-col gap-1 text-blue-300 text-sm">
+    <pre className="border p-4 rounded-md bg-gray-800 flex flex-col gap-1 text-blue-300 text-xs">
       <span className="font-semibold">{fullTypeNames[type]}(</span>
       <span className="ml-5">base64UrlEncode(header) + "." +</span>
       <span className="ml-5">base64UrlEncode(payload),</span>
@@ -164,77 +170,112 @@ const AsymmetricSignature: React.FC<{ type: AsymmetricType }> = ({ type }) => {
   );
 };
 
-interface DecodedToken {
-  header: JwtHeader;
-  payload: JwtPayload;
-  signature?: string | { publicKey: string; privateKey: string };
+type AsymmetricKey = { publicKey: string; privateKey: string };
+
+interface JWTState {
+  header: JWTHeaderParameters;
+  payload: JWTPayload;
+  signature?: string | AsymmetricKey;
 }
 
-export type Action =
-  | { type: 'UPDATE_HEADER'; payload: JwtHeader }
-  | { type: 'UPDATE_PAYLOAD'; payload: JwtPayload };
+export type Action = {
+  type?: 'UPDATE_HEADER' | 'UPDATE_PAYLOAD';
+  payload: JWTHeaderParameters | JWTPayload | any;
+};
 
-export function reducer(state: DecodedToken, action: Action): DecodedToken {
+export function reducer(state: JWTState, action: Action): JWTState {
   switch (action.type) {
     case 'UPDATE_HEADER':
-      return { ...state, header: action.payload };
+      return { ...state, header: action.payload as JWTHeaderParameters };
     case 'UPDATE_PAYLOAD':
-      return { ...state, payload: action.payload };
+      return { ...state, payload: action.payload as JWTPayload };
     default:
-      return state;
+      return { ...state, ...action.payload };
   }
 }
 
-const Index: React.FC = () => {
-  const [jwtToken, setJwtToken] = useState<string>('');
-  const [decodedToken, setDecodedToken] = useState<DecodedToken | null>(null);
+const defaultToken =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
+const JwtDebugger: React.FC = () => {
+  const [jwtToken, setJwtToken] = useState<string>(defaultToken);
+  const [decodedToken, setDecodedToken] = useState<JWTState | null>(null);
   const algorithms = useMemo(() => Object.keys(fullTypeNames), []);
   const [state, dispatch] = useReducer(reducer, {
-    header: {},
+    header: {
+      alg: 'HS256',
+    },
     payload: {},
+    signature: defaultSecret,
   });
 
   useEffect(() => {
     if (!jwtToken) {
-      setDecodedToken(null);
+      dispatch({
+        payload: {
+          header: null,
+          payload: null,
+        },
+      });
       return;
     }
 
-    try {
-      const decoded = jwtDecode(jwtToken);
-      const decodedHeader = jwtDecode(jwtToken, { header: true });
-      setDecodedToken({
-        header: decodedHeader,
-        payload: decoded,
-      });
-    } catch (error) {
-      setDecodedToken(null);
-    }
+    (async () => {
+      try {
+        const decoded = await jose.jwtVerify(
+          jwtToken,
+          new TextEncoder().encode(state.signature as string),
+        );
+        dispatch({
+          payload: {
+            header: decoded.protectedHeader,
+            payload: decoded.payload,
+          },
+        });
+      } catch (error) {}
+    })();
   }, [jwtToken]);
 
   const editToken = (newToken: string) => {
     setJwtToken(newToken);
   };
 
-  const handleEditPayload = (newPayload: string) => {
+  const handleChangeAlgo = async (alg: string) => {
+    const newHeader = { ...state.header, alg };
+    dispatch({ payload: { header: newHeader } });
+    const token = await new jose.SignJWT(state.payload)
+      .setProtectedHeader(newHeader)
+      .sign(new TextEncoder().encode(state.signature as string));
+    setJwtToken(token);
+  };
+
+  const handleEditPayload = async (newPayload: string) => {
     try {
-      const editedToken = `${decodedToken?.header}.${btoa(newPayload)}.${
-        decodedToken?.signature
-      }`;
-      setJwtToken(editedToken);
+      const token = await new jose.SignJWT(JSON.parse(newPayload))
+        .setProtectedHeader(state.header)
+        .sign(new TextEncoder().encode(state.signature as string));
+
+      setJwtToken(token);
     } catch (error) {
       console.error('Error editing payload:', error);
     }
   };
 
-  const handleChangeAlgo = (algo: string) => {};
-
-  const handleEditHeader = (newHeader: string) => {
+  const handleEditHeader = async (newHeaderStr: string) => {
     try {
-      const editedToken = `${btoa(newHeader)}.${decodedToken?.payload}.${
-        decodedToken?.signature
-      }`;
-      setJwtToken(editedToken);
+      const alg = state.header.alg;
+      const signature = symmetricTypes.includes(alg as never)
+        ? new TextEncoder().encode(state.signature as string)
+        : await jose.importPKCS8(
+            (state.signature as AsymmetricKey).privateKey,
+            alg,
+          );
+      const token = await new jose.SignJWT(state.payload)
+        .setProtectedHeader(JSON.parse(newHeaderStr))
+        // .sign(new TextEncoder().encode(signature));
+        .sign(signature);
+
+      setJwtToken(token);
     } catch (error) {
       console.error('Error editing header:', error);
     }
@@ -250,8 +291,8 @@ const Index: React.FC = () => {
   };
 
   return (
-    <div className="w-full h-[95%] flex flex-col items-center justify-center gap-2">
-      <div className="flex flex-row items-center justify-center space-x-2 mt-8">
+    <div className="w-full h-[95%] py-4 flex flex-col items-center justify-center space-y-2">
+      <div className="flex flex-row items-center justify-center space-x-2">
         <Label className="font-semibold">Algorithm</Label>
         <Select onValueChange={handleChangeAlgo}>
           <SelectTrigger className="w-24 bg-slate-900 border-none h-9 text-sm">
@@ -268,7 +309,7 @@ const Index: React.FC = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="flex flex-row px-8 py-4 w-full h-full mx-auto">
+      <div className="flex flex-row px-8 pt-2 w-full h-full mx-auto">
         <div className="w-1/2 pr-4">
           <Label className="mb-2 font-semibold">JWT Token</Label>
           <JwtInput token={jwtToken} onChange={editToken} />
@@ -276,34 +317,51 @@ const Index: React.FC = () => {
         <div className="w-1/2 pl-4">
           <Label className="mb-2 font-semibold">Decoded Token</Label>
           <div className="h-full border border-gray-300 rounded-md">
-            <div className="flex flex-col justify-evenly gap-2.5 px-4 pt-4">
-              <div className="flex flex-col space-y-2">
+            <div className="flex flex-col justify-evenly gap-3 px-4 py-4">
+              <div className="flex flex-col space-y-1.5">
                 <span className="text-sm uppercase">
                   header (algorithm and token type)
                 </span>
-                <ReactJSON
-                  theme="tube"
-                  src={decodedToken?.header || {}}
-                  quotesOnKeys={false}
-                  name={null}
-                  style={jsonViewerStyles}
-                  onEdit={console.log}
+                <CodeMirror
+                  value={JSON.stringify(state?.header || {}, null, 2)}
+                  lang="json"
+                  className="h-32"
+                  extensions={[
+                    EditorView.lineWrapping,
+                    new LanguageSupport(StreamLanguage.define(json)),
+                  ]}
+                  theme="dark"
+                  onChange={handleEditHeader}
                 />
               </div>
-              <div className="flex flex-col space-y-2">
-                <span className="text-sm mt-2 uppercase">payload</span>
-                <ReactJSON
-                  theme="google"
-                  src={decodedToken?.payload || {}}
-                  quotesOnKeys={false}
-                  name={null}
-                  style={jsonViewerStyles}
+              <div className="flex flex-col space-y-1.5">
+                <span className="text-sm uppercase">payload</span>
+                <CodeMirror
+                  value={JSON.stringify(state?.payload || {}, null, 2)}
+                  lang="json"
+                  className="h-32"
+                  extensions={[
+                    EditorView.lineWrapping,
+                    new LanguageSupport(StreamLanguage.define(json)),
+                  ]}
+                  theme="dark"
+                  onChange={handleEditPayload}
                 />
               </div>
-              <div className="flex flex-col space-y-2">
-                <span className="text-sm mt-2 uppercase">verify signature</span>
-                {/* <SymmetricSignature type="HS256" /> */}
-                <AsymmetricSignature type="ES256" />
+              <div className="flex flex-col space-y-1.5">
+                <span className="text-sm uppercase">verify signature</span>
+                {symmetricTypes.includes(state.header.alg as SymmetricType) && (
+                  <SymmetricSignature
+                    type={state.header.alg as SymmetricType}
+                  />
+                )}
+                {asymmetricTypes.includes(
+                  state.header.alg as AsymmetricType,
+                ) && (
+                  <AsymmetricSignature
+                    type={state.header.alg as AsymmetricType}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -313,4 +371,4 @@ const Index: React.FC = () => {
   );
 };
 
-export default Index;
+export default JwtDebugger;
