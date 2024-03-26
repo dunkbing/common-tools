@@ -24,7 +24,7 @@
     "clsx": "^2.1.0",
     "cmdk": "^0.2.1",
     "codemirror": "^6.0.1",
-    "composerize": "^1.6.7",
+    "composerize": "^1.6.8",
     "jose": "^5.2.3",
     "js-beautify": "^1.15.1",
     "json-to-ts": "^1.7.0",
