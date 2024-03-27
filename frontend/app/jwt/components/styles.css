@@ -1,0 +1,20 @@
+.cm-jwt-header {
+  color: #fb015b;
+}
+
+.cm-jwt-payload {
+  color: #b100ff;
+}
+
+.cm-jwt-iv {
+  color: #ff948a;
+}
+
+.cm-jwt-key {
+  color: #89bb86;
+}
+
+.cm-jwt-signature,
+.cm-jwt-authtag {
+  color: #00b9f1;
+}

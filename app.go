@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	"regexp"
-
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/css"
 	"github.com/tdewolff/minify/v2/html"
@@ -12,6 +10,7 @@ import (
 	"github.com/tdewolff/minify/v2/json"
 	"github.com/tdewolff/minify/v2/svg"
 	"github.com/tdewolff/minify/v2/xml"
+	"regexp"
 )
 
 // App struct
@@ -24,10 +23,27 @@ func NewApp() *App {
 	return &App{}
 }
 
-// startup is called when the app starts. The context is saved
-// so we can call the runtime methods
+// startup is called at application startup
 func (a *App) startup(ctx context.Context) {
+	// Perform your setup here
 	a.ctx = ctx
+}
+
+// domReady is called after front-end resources have been loaded
+func (a App) domReady(ctx context.Context) {
+	// Add your action here
+}
+
+// beforeClose is called when the application is about to quit,
+// either by clicking the window close button or calling runtime.Quit.
+// Returning true will cause the application to continue, false will continue shutdown as normal.
+func (a *App) beforeClose(ctx context.Context) (prevent bool) {
+	return false
+}
+
+// shutdown is called at application termination
+func (a *App) shutdown(ctx context.Context) {
+	// Perform your teardown here
 }
 
 // Greet returns a greeting for the given name
@@ -47,8 +63,9 @@ func init() {
 	m.AddFuncRegexp(regexp.MustCompile("[/+]xml$"), xml.Minify)
 }
 
-func (a *App) Minify(mediatype, s string) (string, error) {
-	minified, err := m.String(mediatype, s)
+// Minify minifies the give html
+func (a *App) Minify(mediaType, s string) (string, error) {
+	minified, err := m.String(mediaType, s)
 	if err != nil {
 		return "", err
 	}

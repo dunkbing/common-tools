@@ -2,11 +2,12 @@ module changeme
 
 go 1.21
 
-toolchain go1.21.5
+toolchain go1.22.0
 
-require github.com/wailsapp/wails/v2 v2.8.0
-
-require github.com/tdewolff/parse/v2 v2.7.12 // indirect
+require (
+	github.com/tdewolff/minify/v2 v2.20.19
+	github.com/wailsapp/wails/v2 v2.8.0
+)
 
 require (
 	github.com/bep/debounce v1.2.1 // indirect
@@ -26,7 +27,7 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.4.4 // indirect
 	github.com/samber/lo v1.38.1 // indirect
-	github.com/tdewolff/minify/v2 v2.20.19
+	github.com/tdewolff/parse/v2 v2.7.12 // indirect
 	github.com/tkrajina/go-reflector v0.5.6 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasttemplate v1.2.2 // indirect
@@ -39,4 +40,4 @@ require (
 	golang.org/x/text v0.14.0 // indirect
 )
 
-// replace github.com/wailsapp/wails/v2 v2.7.1 => /Users/dunkbing/.go/pkg/mod
+// replace github.com/wailsapp/wails/v2 v2.8.0 => /Users/Bing/.go/pkg/mod
