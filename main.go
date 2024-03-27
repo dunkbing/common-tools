@@ -24,7 +24,7 @@ func main() {
 
 	// Create application with options
 	err := wails.Run(&options.App{
-		Title:            "go-desk-app",
+		Title:            "ToolFusion",
 		Width:            1300,
 		Height:           768,
 		MinWidth:         1200,
@@ -55,11 +55,19 @@ func main() {
 		},
 		// Mac platform specific options
 		Mac: &mac.Options{
+			TitleBar: &mac.TitleBar{
+				TitlebarAppearsTransparent: true,
+				HideTitle:                  false,
+				HideTitleBar:               false,
+				FullSizeContent:            false,
+				UseToolbar:                 false,
+				HideToolbarSeparator:       true,
+			},
 			Appearance:           mac.NSAppearanceNameDarkAqua,
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
-				Title:   "go-desk-app",
+				Title:   "ToolFusion",
 				Message: "",
 				Icon:    icon,
 			},
