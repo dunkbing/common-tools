@@ -79,7 +79,7 @@ const JWTInput: React.FC<JWTInputProps> = (props) => {
   };
 
   return (
-    <div className="h-full w-full overflow-auto rounded-sm bg-gray-700">
+    <div className="h-full w-full overflow-auto bg-gray-700">
       <CodeMirror
         className="h-full"
         value={props.token}

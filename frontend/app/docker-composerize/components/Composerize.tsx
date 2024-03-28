@@ -1,101 +1,105 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { ClipboardGetText, ClipboardSetText } from "$wailsjs/runtime/runtime";
 import { Textarea } from "@/components/ui/textarea";
-import InputActions from "@/app/base64-string-encode-decode/components/InputActions";
+import InputActions, {
+  ConvertType,
+} from "@/app/docker-composerize/components/InputActions";
 import OutputActions from "@/app/base64-string-encode-decode/components/OutputActions";
+import { EditorView } from "codemirror";
+import { LanguageSupport, StreamLanguage } from "@codemirror/language";
+import { yaml } from "@codemirror/legacy-modes/mode/yaml";
+import CodeMirror, {
+  placeholder,
+  ReactCodeMirrorRef,
+} from "@uiw/react-codemirror";
+import composerize from "composerize";
+import decomposerize from "decomposerize";
 
 const Composerize: React.FC = () => {
+  const [inputText, setInputText] = useState<string>("");
   const [outputText, setOutputText] = useState<string>("");
-  const [isEncode, setIsEncode] = useState<boolean>(true);
+  const [convertType, setConvertType] = useState<ConvertType>("composerize");
 
-  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const editorRef = useRef<ReactCodeMirrorRef | null>(null);
+
+  const placeholderText: Record<ConvertType, string> = {
+    composerize: "Enter your docker run command here",
+    "de-composerize": "Enter your docker-compose here",
+  };
+
+  const handleInputChange = (value: string) => {
+    setInputText(value);
+    handleConvert(value);
+  };
+
+  const handleConverterChange = (type: ConvertType) => {
+    setConvertType(type);
+  };
 
   useEffect(() => {
-    const handleTabKeyPress = (event: KeyboardEvent) => {
-      if (event.key === "Tab") {
-        event.preventDefault();
-        const { current } = textAreaRef;
-        if (current) {
-          const { selectionStart, selectionEnd, value } = current;
-          const newValue =
-            value.substring(0, selectionStart) +
-            "    " +
-            value.substring(selectionEnd);
-          current.value = newValue;
-          current.setSelectionRange(selectionStart + 4, selectionStart + 4);
-        }
-      }
-    };
+    handleConvert(inputText);
+  }, [convertType]);
 
-    window.addEventListener("keydown", handleTabKeyPress);
-
-    return () => {
-      window.removeEventListener("keydown", handleTabKeyPress);
-    };
-  }, []);
-
-  useEffect(() => {
-    handleConvert(textAreaRef.current?.value || "");
-  }, [isEncode]);
-
-  const convertText = (text: string) => {
-    return isEncode ? encodeURIComponent(text) : decodeURIComponent(text);
-  };
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    handleConvert(event.target.value);
-  };
-
-  const handleEncodeDecodeChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    setIsEncode(event.target.value === "encode");
-  };
-
-  const handleConvert = (inputText: string) => {
+  const handleConvert = (text: string) => {
     try {
-      setOutputText(convertText(inputText));
+      if (convertType === "composerize") {
+        setOutputText(composerize(text) || "");
+        return;
+      }
+      setOutputText(decomposerize(text) || "");
     } catch (error) {
-      setOutputText("Invalid input for decoding");
+      setOutputText("");
     }
   };
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(outputText);
-    ClipboardSetText(outputText);
+    void navigator.clipboard.writeText(outputText);
+    void ClipboardSetText(outputText);
   };
 
   const handlePaste = async () => {
     const clipboardText = await ClipboardGetText();
-    if (textAreaRef.current === null) return;
-    textAreaRef.current.focus();
-    textAreaRef.current.value = clipboardText;
+    if (editorRef.current === null) return;
+    editorRef.current.view?.focus();
+    setInputText(clipboardText);
     handleConvert(clipboardText);
   };
 
   const handleUseAsInput = () => {
-    if (textAreaRef.current === null) return;
-    textAreaRef.current.focus();
-    textAreaRef.current.value = outputText;
+    if (editorRef.current === null || !outputText) return;
+    editorRef.current.view?.focus();
+    setInputText(outputText);
     handleConvert(outputText);
+    if (convertType === "composerize") {
+      setConvertType("de-composerize");
+    } else {
+      setConvertType("composerize");
+    }
   };
 
   return (
-    <div className="mx-auto flex h-full w-full flex-col p-8">
-      <div className="flex h-1/2 flex-col gap-1">
+    <div className="mx-auto flex h-full w-full flex-col space-y-4 px-8 py-6">
+      <div className="flex h-1/2 flex-col">
         <InputActions
-          isEncode={isEncode}
-          handleEncodeDecodeChange={handleEncodeDecodeChange}
-          handlePaste={handlePaste}
+          type={convertType}
+          onConverterChange={handleConverterChange}
+          onPaste={handlePaste}
         />
-        <Textarea
-          className="h-2/4 bg-slate-700"
-          ref={textAreaRef}
+        <CodeMirror
+          ref={editorRef}
+          value={inputText}
+          lang="yaml"
+          className="h-full"
+          extensions={[
+            placeholder(placeholderText[convertType]),
+            EditorView.lineWrapping,
+            new LanguageSupport(StreamLanguage.define(yaml)),
+          ]}
+          theme="dark"
           onChange={handleInputChange}
-          placeholder="Type or paste here..."
         />
       </div>
       <div className="h-1/2">
@@ -104,7 +108,7 @@ const Composerize: React.FC = () => {
           handleUseAsInput={handleUseAsInput}
         />
         <Textarea
-          className="h-3/4 min-h-16 overflow-y-auto break-all bg-slate-700 px-3 py-2"
+          className="h-3/4 min-h-16 overflow-y-auto break-all bg-slate-700 px-3 py-2 font-semibold text-orange-200"
           disabled
           value={outputText}
           placeholder="Output will appear here..."

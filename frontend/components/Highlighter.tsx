@@ -186,7 +186,7 @@ const Highlighter: FC<HighLighterProps> = ({
 }) => {
   return (
     <Highlight theme={theme} code={code} language={language}>
-      {({ className, style, tokens, getLineProps, getTokenProps }) => (
+      {({ className, tokens, getLineProps, getTokenProps }) => (
         <pre className={className}>
           {tokens.map((line, i) => (
             <div

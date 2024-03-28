@@ -86,7 +86,7 @@ const HTMLViewer: React.FC = () => {
     if (!editorRef.current) return;
     editorRef.current?.view?.focus();
     const sample = `<!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>This is a sample HTML page</title>
   </head>
@@ -142,7 +142,7 @@ const HTMLViewer: React.FC = () => {
         <label className="text-sm font-semibold">Output</label>
       </div>
       <div className="flex h-full w-full flex-row justify-center gap-4 px-4">
-        <div className="h-full w-1/2 overflow-auto rounded-sm bg-gray-700">
+        <div className="h-full w-1/2 overflow-auto bg-gray-700">
           <CodeMirror
             value={htmlText}
             ref={editorRef}
