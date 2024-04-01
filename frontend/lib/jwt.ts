@@ -3,7 +3,7 @@ import * as jose from "jose";
 import { pki } from "node-forge";
 import { JWTHeaderParameters, JWTPayload } from "jose";
 
-const strings = {
+export const strings = {
   common: {
     shareThisJwt: "Share JWT",
     jwtIoUrlCopied: "Copied",
@@ -186,21 +186,26 @@ export async function verify(
     return Promise.resolve({ validSignature: false, verifyResult: null });
   }
 
-  const key = await getJoseKey(
-    decoded.header,
-    secretOrPublicKeyString,
-    base64Secret,
-    Types.PUBLIC
-  );
+  try {
+    const key = await getJoseKey(
+      decoded.header,
+      secretOrPublicKeyString,
+      base64Secret,
+      Types.PUBLIC
+    );
 
-  const verifyResult = await jose.compactVerify(jwt, key);
-  return {
-    validSignature: true,
-    validBase64: jwt
-      .split(".")
-      .reduce((valid, s) => valid && isValidBase64String(s), true),
-    verifyResult,
-  };
+    const verifyResult = await jose.compactVerify(jwt, key);
+    return {
+      validSignature: true,
+      validBase64: jwt
+        .split(".")
+        .reduce((valid, s) => valid && isValidBase64String(s), true),
+      verifyResult,
+    };
+  } catch (e) {
+    console.error("Could not verify token: ", e);
+    return { validSignature: false, verifyResult: null };
+  }
 }
 
 export function decode(jwt: string) {

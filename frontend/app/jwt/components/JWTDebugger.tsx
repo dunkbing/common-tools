@@ -11,6 +11,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { CircleCheckBig, CircleX } from "lucide-react";
 
 import { Label } from "@/components/ui/label";
 import {
@@ -24,7 +25,9 @@ import {
 import { LanguageSupport, StreamLanguage } from "@codemirror/language";
 import { EditorView } from "codemirror";
 import JWTInput from "./JWTInput";
-import { sign, verify } from "@/lib/jwt";
+import { sign, strings, verify } from "@/lib/jwt";
+import { clsx } from "clsx";
+import { Textarea } from "@/components/ui/textarea";
 
 const symmetricTypes = ["HS256", "HS384", "HS512"] as const;
 export type SymmetricType = (typeof symmetricTypes)[number];
@@ -107,10 +110,10 @@ const generateJWT = async ({
 }) => {
   let token = "";
   const alg = header.alg;
-  if (symmetricTypes.includes(alg as SymmetricType)) {
+  if (getAlgoType(alg) === "symmetric") {
     const { key, base64Encoded } = signature as SymmetricKey;
     token = await sign(header, payload, key, base64Encoded);
-  } else if (asymmetricTypes.includes(alg as AsymmetricType)) {
+  } else {
     const privateKey = (signature as AsymmetricKey).privateKey;
     token = await sign(header, payload, privateKey);
   }
@@ -145,7 +148,8 @@ const SymmetricSignature: React.FC<{
   onEditSignature?: (signature: SymmetricKey) => void;
 }> = ({ type, signature, onEditSignature }) => {
   const signatureRef = useRef(signature);
-  const changeSignature: ChangeEventHandler<HTMLInputElement> = (e) => {
+
+  const editSignature: ChangeEventHandler<HTMLInputElement> = (e) => {
     signatureRef.current.key = e.target.value;
     onEditSignature?.(signatureRef.current);
   };
@@ -156,7 +160,7 @@ const SymmetricSignature: React.FC<{
   };
 
   return (
-    <pre className="flex flex-col gap-1 rounded-md border bg-gray-800 p-4 text-xs text-blue-300">
+    <pre className="flex flex-col gap-1 rounded-md border bg-gray-800 p-3 text-xs text-blue-300">
       <span className="font-semibold">{fullTypeNames[type]}(</span>
       <span className="ml-5">base64UrlEncode(header) + &quot;.&quot; +</span>
       <span className="ml-5">base64UrlEncode(payload),</span>
@@ -166,7 +170,7 @@ const SymmetricSignature: React.FC<{
         className="ml-5 rounded-md border px-2 py-1 focus:border-blue-300 focus:outline-none focus:ring"
         data-tippy=""
         data-original-title="Weak secret!"
-        onChange={changeSignature}
+        onChange={editSignature}
       />
       <span className="is-base64-encoded-label">
         ){" "}
@@ -185,28 +189,50 @@ const SymmetricSignature: React.FC<{
   );
 };
 
-const AsymmetricSignature: React.FC<{ type: AsymmetricType }> = ({ type }) => {
+const getAlgoType = (algo: string) => {
+  if (symmetricTypes.includes(algo as SymmetricType)) return "symmetric";
+  return "asymmetric";
+};
+
+const AsymmetricSignature: React.FC<{
+  type: AsymmetricType;
+  signature: AsymmetricKey;
+  onEditSignature?: (signature: AsymmetricKey) => void;
+}> = ({ type, signature, onEditSignature }) => {
   const secret = {
     public: publicKey,
     private: privateKey,
   };
+  const signatureRef = useRef(signature);
+
+  const editPublicKey: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
+    signatureRef.current.publicKey = e.target.value;
+    onEditSignature?.(signatureRef.current);
+  };
+
+  const editPrivateKey: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
+    signatureRef.current.privateKey = e.target.value;
+    onEditSignature?.(signatureRef.current);
+  };
 
   return (
-    <pre className="flex flex-col gap-1 rounded-md border bg-gray-800 p-4 text-xs text-blue-300">
+    <pre className="flex flex-col gap-1 rounded-md border bg-gray-800 p-3 text-xs text-blue-300">
       <span className="font-semibold">{fullTypeNames[type]}(</span>
       <span className="ml-5">base64UrlEncode(header) + &quot;.&quot; +</span>
       <span className="ml-5">base64UrlEncode(payload),</span>
-      <textarea
+      <Textarea
         name="public-key"
         defaultValue={secret.public}
         rows={4}
-        className="ml-5 rounded-md border px-2 py-1 text-blue-500 focus:border-blue-500 focus:outline-none focus:ring"
+        className="ml-5 w-11/12 rounded-md border px-2 py-1 text-blue-500 focus:border-blue-500 focus:outline-none focus:ring"
+        onChange={editPublicKey}
       />
-      <textarea
+      <Textarea
         name="private-key"
         defaultValue={secret.private}
         rows={4}
-        className="ml-5 rounded-md border px-2 py-1 text-blue-500 focus:border-blue-500 focus:outline-none focus:ring"
+        className="ml-5 w-11/12 rounded-md border px-2 py-1 text-blue-500 focus:border-blue-500 focus:outline-none focus:ring"
+        onChange={editPrivateKey}
       />
       <span className="is-base64-encoded-label">)</span>
     </pre>
@@ -217,6 +243,7 @@ interface JWTState {
   header: JWTHeaderParameters;
   payload: JWTPayload;
   signature: SymmetricKey | AsymmetricKey;
+  validSignature: boolean;
 }
 
 export type Action = {
@@ -250,7 +277,13 @@ const JWTDebugger: React.FC = () => {
       key: defaultSecret,
       base64Encoded: false,
     },
+    validSignature: true,
   });
+  const symmetricSigRef = useRef({
+    key: defaultSecret,
+    base64Encoded: false,
+  });
+  const asymmetricSigRef = useRef({ publicKey, privateKey });
 
   useEffect(() => {
     if (!jwtToken) {
@@ -270,6 +303,7 @@ const JWTDebugger: React.FC = () => {
           alg: state.header.alg,
           signature: state.signature,
         });
+        dispatch({ payload: { validSignature: res?.validSignature } });
         if (!res?.verifyResult) return;
         const verifyResult = res.verifyResult;
         const decoder = new TextDecoder();
@@ -281,23 +315,36 @@ const JWTDebugger: React.FC = () => {
             payload,
           },
         });
-      } catch (error) {}
+      } catch (error) {
+        console.log(error);
+      }
     })();
-  }, [jwtToken]);
+  }, [jwtToken, state.header?.alg, state.signature]);
 
   const editToken = (newToken: string) => {
     setJwtToken(newToken);
   };
 
-  const handleChangeAlgo = async (alg: string) => {
-    const newHeader = { ...state.header, alg };
-    dispatch({ payload: { header: newHeader } });
+  const handleChangeAlgo = async (newAlg: string) => {
+    const currentAlg = state.header.alg;
+    const newHeader = { ...state.header, alg: newAlg };
+    let signature = state.signature;
+    const currentAlgType = getAlgoType(currentAlg);
+    const newAlgType = getAlgoType(newAlg);
+    if (currentAlgType !== newAlgType) {
+      if (newAlgType === "symmetric") {
+        signature = symmetricSigRef.current;
+      } else {
+        signature = asymmetricSigRef.current;
+      }
+    }
     const token = await generateJWT({
       payload: state.payload,
       header: newHeader,
-      signature: state.signature,
+      signature,
     });
     setJwtToken(token);
+    dispatch({ payload: { header: newHeader, signature } });
   };
 
   const handleEditPayload = async (newPayload: string) => {
@@ -327,7 +374,21 @@ const JWTDebugger: React.FC = () => {
     }
   };
 
-  const handleEditSignature = async (signature: SymmetricKey) => {
+  const handleEditSymmetricSignature = async (signature: SymmetricKey) => {
+    try {
+      symmetricSigRef.current = { ...signature };
+      const token = await generateJWT({
+        payload: state.payload,
+        header: state.header,
+        signature,
+      });
+      setJwtToken(token);
+    } catch (error) {
+      console.error("Error editing signature:", error);
+    }
+  };
+
+  const handleEditAsymmetricSignature = async (signature: AsymmetricKey) => {
     try {
       const token = await generateJWT({
         payload: state.payload,
@@ -359,23 +420,41 @@ const JWTDebugger: React.FC = () => {
           </SelectContent>
         </Select>
       </div>
-      <div className="mx-auto flex h-full w-full flex-row px-8 pt-2">
-        <div className="w-1/2 pr-4">
+      <div className="mx-auto flex h-full w-full flex-col px-8 pt-2">
+        <div className="h-[35%] pb-4">
           <Label className="mb-2 font-semibold">JWT Token</Label>
           <JWTInput token={jwtToken} onChange={editToken} />
         </div>
-        <div className="w-1/2 pl-4">
+        <div
+          className={clsx("flex h-[10%] flex-row items-center capitalize ", {
+            "text-blue-300": state.validSignature,
+            "text-red-300": !state.validSignature,
+          })}
+        >
+          {state.validSignature ? (
+            <>
+              <CircleCheckBig className="mr-2" />
+              {strings.editor.signatureVerified}
+            </>
+          ) : (
+            <>
+              <CircleX className="mr-2" />
+              {strings.editor.signatureInvalid}
+            </>
+          )}
+        </div>
+        <div className="h-[55%] pt-4">
           <Label className="mb-2 font-semibold">Decoded Token</Label>
           <div className="h-full rounded-md border border-gray-300">
-            <div className="flex flex-col justify-evenly gap-3 px-4 py-4">
-              <div className="flex flex-col space-y-1.5">
-                <span className="text-sm uppercase">
+            <div className="flex flex-row justify-evenly gap-3 px-5 py-4">
+              <div className="flex w-1/3 flex-col space-y-1.5">
+                <Label className="text-sm uppercase">
                   header (algorithm and token type)
-                </span>
+                </Label>
                 <CodeMirror
                   value={JSON.stringify(state?.header || {}, null, 2)}
                   lang="json"
-                  className="h-32"
+                  className="h-60"
                   extensions={[
                     EditorView.lineWrapping,
                     new LanguageSupport(StreamLanguage.define(json)),
@@ -384,12 +463,12 @@ const JWTDebugger: React.FC = () => {
                   onChange={handleEditHeader}
                 />
               </div>
-              <div className="flex flex-col space-y-1.5">
-                <span className="text-sm uppercase">payload</span>
+              <div className="flex w-1/3 flex-col space-y-1.5">
+                <Label className="text-sm uppercase">payload</Label>
                 <CodeMirror
                   value={JSON.stringify(state?.payload || {}, null, 2)}
                   lang="json"
-                  className="h-32"
+                  className="h-60"
                   extensions={[
                     EditorView.lineWrapping,
                     new LanguageSupport(StreamLanguage.define(json)),
@@ -398,20 +477,20 @@ const JWTDebugger: React.FC = () => {
                   onChange={handleEditPayload}
                 />
               </div>
-              <div className="flex flex-col space-y-1.5">
-                <span className="text-sm uppercase">verify signature</span>
-                {symmetricTypes.includes(state.header.alg as SymmetricType) && (
+              <div className="flex w-1/3 flex-col space-y-1.5">
+                <Label className="text-sm uppercase">verify signature</Label>
+                {getAlgoType(state.header?.alg) === "symmetric" && (
                   <SymmetricSignature
                     type={state.header.alg as SymmetricType}
                     signature={state.signature as SymmetricKey}
-                    onEditSignature={handleEditSignature}
+                    onEditSignature={handleEditSymmetricSignature}
                   />
                 )}
-                {asymmetricTypes.includes(
-                  state.header.alg as AsymmetricType
-                ) && (
+                {getAlgoType(state.header?.alg) === "asymmetric" && (
                   <AsymmetricSignature
                     type={state.header.alg as AsymmetricType}
+                    signature={state.signature as AsymmetricKey}
+                    onEditSignature={handleEditAsymmetricSignature}
                   />
                 )}
               </div>
