@@ -2,8 +2,15 @@
 
 import { json } from "@codemirror/legacy-modes/mode/javascript";
 import CodeMirror from "@uiw/react-codemirror";
-import * as jose from "jose";
-import React, { useEffect, useMemo, useReducer, useState } from "react";
+import { JWTHeaderParameters, JWTPayload } from "jose";
+import React, {
+  ChangeEventHandler,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
 
 import { Label } from "@/components/ui/label";
 import {
@@ -16,8 +23,8 @@ import {
 } from "@/components/ui/select";
 import { LanguageSupport, StreamLanguage } from "@codemirror/language";
 import { EditorView } from "codemirror";
-import { JWTHeaderParameters, JWTPayload } from "jose";
 import JWTInput from "./JWTInput";
+import { sign, verify } from "@/lib/jwt";
 
 const symmetricTypes = ["HS256", "HS384", "HS512"] as const;
 export type SymmetricType = (typeof symmetricTypes)[number];
@@ -86,36 +93,68 @@ TQrKhArgLXX4v3CddjfTRJkFWDbE/CkvKZNOrcf1nhaGCPspRJj2KUkj1Fhl9Cnc
 dn/RsYEONbwQSjIfMPkvxF+8HQ==
 -----END PRIVATE KEY-----`;
 
-const secrets: Record<
-  AlgorithmType,
-  string | { publicKey: string; privateKey: string }
-> = {
-  HS256: "your-256-bit-secret",
-  HS384: "your-384-bit-secret",
-  HS512: "your-512-bit-secret",
-  RS256: {
-    publicKey,
-    privateKey,
-  },
-  RS384: {
-    publicKey,
-    privateKey,
-  },
-  RS512: {
-    publicKey,
-    privateKey,
-  },
-  ES256: { publicKey, privateKey },
-  ES384: { publicKey, privateKey },
-  ES512: { publicKey, privateKey },
-  PS256: { publicKey, privateKey },
-  PS384: { publicKey, privateKey },
-  PS512: { publicKey, privateKey },
+type SymmetricKey = { key: string; base64Encoded: boolean };
+type AsymmetricKey = { publicKey: string; privateKey: string };
+
+const generateJWT = async ({
+  payload,
+  header,
+  signature,
+}: {
+  payload: JWTPayload;
+  header: JWTHeaderParameters;
+  signature: SymmetricKey | AsymmetricKey;
+}) => {
+  let token = "";
+  const alg = header.alg;
+  if (symmetricTypes.includes(alg as SymmetricType)) {
+    const { key, base64Encoded } = signature as SymmetricKey;
+    token = await sign(header, payload, key, base64Encoded);
+  } else if (asymmetricTypes.includes(alg as AsymmetricType)) {
+    const privateKey = (signature as AsymmetricKey).privateKey;
+    token = await sign(header, payload, privateKey);
+  }
+
+  return token;
+};
+
+const verifyJWT = async ({
+  token,
+  alg,
+  signature,
+}: {
+  token: string;
+  alg: string;
+  signature: SymmetricKey | AsymmetricKey;
+}) => {
+  if (symmetricTypes.includes(alg as SymmetricType)) {
+    const { key, base64Encoded } = signature as SymmetricKey;
+    return await verify(token, key, base64Encoded);
+  } else if (asymmetricTypes.includes(alg as AsymmetricType)) {
+    const publicKey = (signature as AsymmetricKey).publicKey;
+    return await verify(token, publicKey);
+  }
+  return null;
 };
 
 const defaultSecret = "your-256-bit-secret";
 
-const SymmetricSignature: React.FC<{ type: SymmetricType }> = ({ type }) => {
+const SymmetricSignature: React.FC<{
+  type: SymmetricType;
+  signature: SymmetricKey;
+  onEditSignature?: (signature: SymmetricKey) => void;
+}> = ({ type, signature, onEditSignature }) => {
+  const signatureRef = useRef(signature);
+  const changeSignature: ChangeEventHandler<HTMLInputElement> = (e) => {
+    signatureRef.current.key = e.target.value;
+    onEditSignature?.(signatureRef.current);
+  };
+
+  const toggleBase64: ChangeEventHandler<HTMLInputElement> = (e) => {
+    signatureRef.current.base64Encoded = e.target.checked;
+    onEditSignature?.(signatureRef.current);
+  };
+
   return (
     <pre className="flex flex-col gap-1 rounded-md border bg-gray-800 p-4 text-xs text-blue-300">
       <span className="font-semibold">{fullTypeNames[type]}(</span>
@@ -127,6 +166,7 @@ const SymmetricSignature: React.FC<{ type: SymmetricType }> = ({ type }) => {
         className="ml-5 rounded-md border px-2 py-1 focus:border-blue-300 focus:outline-none focus:ring"
         data-tippy=""
         data-original-title="Weak secret!"
+        onChange={changeSignature}
       />
       <span className="is-base64-encoded-label">
         ){" "}
@@ -135,6 +175,7 @@ const SymmetricSignature: React.FC<{ type: SymmetricType }> = ({ type }) => {
           type="checkbox"
           name="is-base64-encoded"
           className="mr-2"
+          onChange={toggleBase64}
         />
         <label htmlFor="is-base64-encoded" className="cursor-pointer">
           secret base64 encoded
@@ -172,12 +213,10 @@ const AsymmetricSignature: React.FC<{ type: AsymmetricType }> = ({ type }) => {
   );
 };
 
-type AsymmetricKey = { publicKey: string; privateKey: string };
-
 interface JWTState {
   header: JWTHeaderParameters;
   payload: JWTPayload;
-  signature?: string | AsymmetricKey;
+  signature: SymmetricKey | AsymmetricKey;
 }
 
 export type Action = {
@@ -201,14 +240,16 @@ const defaultToken =
 
 const JWTDebugger: React.FC = () => {
   const [jwtToken, setJwtToken] = useState<string>(defaultToken);
-  const [decodedToken, setDecodedToken] = useState<JWTState | null>(null);
   const algorithms = useMemo(() => Object.keys(fullTypeNames), []);
   const [state, dispatch] = useReducer(reducer, {
     header: {
       alg: "HS256",
     },
     payload: {},
-    signature: defaultSecret,
+    signature: {
+      key: defaultSecret,
+      base64Encoded: false,
+    },
   });
 
   useEffect(() => {
@@ -224,14 +265,20 @@ const JWTDebugger: React.FC = () => {
 
     (async () => {
       try {
-        const decoded = await jose.jwtVerify(
-          jwtToken,
-          new TextEncoder().encode(state.signature as string)
-        );
+        const res = await verifyJWT({
+          token: jwtToken,
+          alg: state.header.alg,
+          signature: state.signature,
+        });
+        if (!res?.verifyResult) return;
+        const verifyResult = res.verifyResult;
+        const decoder = new TextDecoder();
+        const payload = JSON.parse(decoder.decode(verifyResult.payload));
+
         dispatch({
           payload: {
-            header: decoded.protectedHeader,
-            payload: decoded.payload,
+            header: verifyResult.protectedHeader,
+            payload,
           },
         });
       } catch (error) {}
@@ -245,18 +292,21 @@ const JWTDebugger: React.FC = () => {
   const handleChangeAlgo = async (alg: string) => {
     const newHeader = { ...state.header, alg };
     dispatch({ payload: { header: newHeader } });
-    const token = await new jose.SignJWT(state.payload)
-      .setProtectedHeader(newHeader)
-      .sign(new TextEncoder().encode(state.signature as string));
+    const token = await generateJWT({
+      payload: state.payload,
+      header: newHeader,
+      signature: state.signature,
+    });
     setJwtToken(token);
   };
 
   const handleEditPayload = async (newPayload: string) => {
     try {
-      const token = await new jose.SignJWT(JSON.parse(newPayload))
-        .setProtectedHeader(state.header)
-        .sign(new TextEncoder().encode(state.signature as string));
-
+      const token = await generateJWT({
+        payload: JSON.parse(newPayload),
+        header: state.header,
+        signature: state.signature,
+      });
       setJwtToken(token);
     } catch (error) {
       console.error("Error editing payload:", error);
@@ -265,17 +315,11 @@ const JWTDebugger: React.FC = () => {
 
   const handleEditHeader = async (newHeaderStr: string) => {
     try {
-      const alg = state.header.alg;
-      const signature = symmetricTypes.includes(alg as never)
-        ? new TextEncoder().encode(state.signature as string)
-        : await jose.importPKCS8(
-            (state.signature as AsymmetricKey).privateKey,
-            alg
-          );
-      const token = await new jose.SignJWT(state.payload)
-        .setProtectedHeader(JSON.parse(newHeaderStr))
-        // .sign(new TextEncoder().encode(signature));
-        .sign(signature);
+      const token = await generateJWT({
+        payload: state.payload,
+        header: JSON.parse(newHeaderStr),
+        signature: state.signature,
+      });
 
       setJwtToken(token);
     } catch (error) {
@@ -283,10 +327,14 @@ const JWTDebugger: React.FC = () => {
     }
   };
 
-  const handleEditSignature = (newSignature: string) => {
+  const handleEditSignature = async (signature: SymmetricKey) => {
     try {
-      const editedToken = `${decodedToken?.header}.${decodedToken?.payload}.${newSignature}`;
-      setJwtToken(editedToken);
+      const token = await generateJWT({
+        payload: state.payload,
+        header: state.header,
+        signature,
+      });
+      setJwtToken(token);
     } catch (error) {
       console.error("Error editing signature:", error);
     }
@@ -355,6 +403,8 @@ const JWTDebugger: React.FC = () => {
                 {symmetricTypes.includes(state.header.alg as SymmetricType) && (
                   <SymmetricSignature
                     type={state.header.alg as SymmetricType}
+                    signature={state.signature as SymmetricKey}
+                    onEditSignature={handleEditSignature}
                   />
                 )}
                 {asymmetricTypes.includes(
