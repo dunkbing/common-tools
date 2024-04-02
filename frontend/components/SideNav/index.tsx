@@ -18,8 +18,6 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-  CommandSeparator,
-  CommandShortcut,
 } from "@/components/ui/command";
 import IconBase64 from "../../assets/icons/base64";
 import IconJwt from "../../assets/icons/jwt";
@@ -75,7 +73,7 @@ export const menus = {
   },
 };
 
-export const menuSlugs = {
+export const menuSlugs: Record<string, string> = {
   jsonViewer: convertToSlug(menus.jsonViewer.title),
   jsonTransformer: convertToSlug(menus.jsonTransformer.title),
   base64: convertToSlug(menus.base64.title),
@@ -121,7 +119,6 @@ export default function SideNav() {
               {Object.entries(menus).map(([key, menu]) => (
                 <Link key={key} href={`/${menuSlugs[key as Menu]}`}>
                   <CommandItem
-                    // onSelect={handleMenuClick(key as Menu)}
                     className={clsx("gap-2 font-semibold", {
                       "pointer-events-none bg-slate-200 text-slate-800":
                         pathname === menuSlugs[key as Menu],
@@ -135,23 +132,6 @@ export default function SideNav() {
                   </CommandItem>
                 </Link>
               ))}
-            </CommandGroup>
-            <CommandSeparator />
-            <CommandGroup heading="Others" className="text-sm text-slate-50">
-              <CommandItem>
-                <span>Profile</span>
-                <CommandShortcut>⌘P</CommandShortcut>
-              </CommandItem>
-              <CommandItem>
-                {/* <IconMail className="mr-2 h-4 w-4" /> */}
-                <span>Mail</span>
-                <CommandShortcut>⌘B</CommandShortcut>
-              </CommandItem>
-              <CommandItem>
-                {/* <IconSettings className="mr-2 h-4 w-4" /> */}
-                <span>Settings</span>
-                <CommandShortcut>⌘S</CommandShortcut>
-              </CommandItem>
             </CommandGroup>
           </CommandList>
         </Command>
