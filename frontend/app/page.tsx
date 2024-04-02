@@ -1,6 +1,5 @@
-import Image from "next/image";
-import Base64Converter from "@/app/base64-string-encode-decode/components/Base64Converter";
+import JSONViewer from "@/app/json-viewer/components/JSONViewer";
 
 export default function Home() {
-  return <Base64Converter />;
+  return <JSONViewer />;
 }
