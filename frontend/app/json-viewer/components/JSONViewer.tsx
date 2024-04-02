@@ -37,6 +37,7 @@ const JSONViewer: React.FC = () => {
   const { toast } = useToast();
 
   const handleInputChange = (value: string) => {
+    setRawJSON(value);
     parseJson(value);
   };
 
@@ -63,9 +64,9 @@ const JSONViewer: React.FC = () => {
     try {
       const parsedJson = JSON.parse(rawJSON);
       const formattedJson = JSON.stringify(parsedJson, null, indentWidth);
+      setRawJSON(formattedJson);
       if (!editorRef.current) return;
       editorRef.current.view?.focus();
-      setRawJSON(formattedJson);
     } catch (error) {
       console.log(error);
     }
