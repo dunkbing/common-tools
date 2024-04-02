@@ -63,9 +63,15 @@ const fullTypeNames: Record<AlgorithmType, string> = {
 };
 
 const publicKey = `-----BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEEVs/o5+uQbTjL3chynL4wXgUg2R9
-q9UU8I5mEovUf86QZ7kOBIjJwqnzD1omageEHWwHdBO6B+dFabmdT9POxg==
------END PUBLIC KEY-----`;
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu1SU1LfVLPHCozMxH2Mo
+4lgOEePzNm0tRgeLezV6ffAt0gunVTLw7onLRnrq0/IzW7yWR7QkrmBL7jTKEn5u
++qKhbwKfBstIs+bMY2Zkp18gnTxKLxoS2tFczGkPLPgizskuemMghRniWaoLcyeh
+kd3qqGElvW/VDL5AaWTg0nLVkjRo9z+40RQzuVaE8AkAFmxZzow3x+VJYKdjykkJ
+0iT9wCS0DRTXu269V264Vf/3jvredZiKRkgwlL9xNAwxXFg0x/XFw005UWVRIkdg
+cKWTjpBP2dPwVZ4WWC+9aGVd+Gyn1o0CLelf4rEjGoXbAAEgAqeGUxrcIlbjXfbc
+mwIDAQAB
+-----END PUBLIC KEY-----
+`;
 
 const privateKey = `-----BEGIN PRIVATE KEY-----
 MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC7VJTUt9Us8cKj
@@ -94,7 +100,8 @@ et6INsK0oG8XVGXSpQvQh3RUYekCZQkBBFcpqWpbIEsCgYAnM3DQf3FJoSnXaMhr
 VBIovic5l0xFkEHskAjFTevO86Fsz1C2aSeRKSqGFoOQ0tmJzBEs1R6KqnHInicD
 TQrKhArgLXX4v3CddjfTRJkFWDbE/CkvKZNOrcf1nhaGCPspRJj2KUkj1Fhl9Cnc
 dn/RsYEONbwQSjIfMPkvxF+8HQ==
------END PRIVATE KEY-----`;
+-----END PRIVATE KEY-----
+`;
 
 type SymmetricKey = { key: string; base64Encoded: boolean };
 type AsymmetricKey = { publicKey: string; privateKey: string };
@@ -197,8 +204,9 @@ const getAlgoType = (algo: string) => {
 const AsymmetricSignature: React.FC<{
   type: AsymmetricType;
   signature: AsymmetricKey;
-  onEditSignature?: (signature: AsymmetricKey) => void;
-}> = ({ type, signature, onEditSignature }) => {
+  onEditPrivateKey?: (key: string) => void;
+  onEditPublicKey?: (key: string) => void;
+}> = ({ type, signature, onEditPublicKey, onEditPrivateKey }) => {
   const secret = {
     public: publicKey,
     private: privateKey,
@@ -206,13 +214,15 @@ const AsymmetricSignature: React.FC<{
   const signatureRef = useRef(signature);
 
   const editPublicKey: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
-    signatureRef.current.publicKey = e.target.value;
-    onEditSignature?.(signatureRef.current);
+    const publicKey = e.target.value;
+    signatureRef.current.publicKey = publicKey;
+    onEditPublicKey?.(publicKey);
   };
 
   const editPrivateKey: ChangeEventHandler<HTMLTextAreaElement> = (e) => {
-    signatureRef.current.privateKey = e.target.value;
-    onEditSignature?.(signatureRef.current);
+    const privateKey = e.target.value;
+    signatureRef.current.privateKey = privateKey;
+    onEditPublicKey?.(privateKey);
   };
 
   return (
@@ -321,6 +331,30 @@ const JWTDebugger: React.FC = () => {
     })();
   }, [jwtToken, state.header?.alg, state.signature]);
 
+  const verify = async (
+    token: string,
+    alg: string,
+    signature: SymmetricKey | AsymmetricKey
+  ) => {
+    const res = await verifyJWT({
+      token,
+      alg,
+      signature,
+    });
+    dispatch({ payload: { validSignature: res?.validSignature } });
+    if (!res?.verifyResult) return;
+    const verifyResult = res.verifyResult;
+    const decoder = new TextDecoder();
+    const payload = JSON.parse(decoder.decode(verifyResult.payload));
+
+    dispatch({
+      payload: {
+        header: verifyResult.protectedHeader,
+        payload,
+      },
+    });
+  };
+
   const editToken = (newToken: string) => {
     setJwtToken(newToken);
   };
@@ -388,14 +422,29 @@ const JWTDebugger: React.FC = () => {
     }
   };
 
-  const handleEditAsymmetricSignature = async (signature: AsymmetricKey) => {
+  const handleEditPrivateKey = async (privateKey: string) => {
     try {
+      const signature = { ...state.signature } as AsymmetricKey;
+      signature.privateKey = privateKey;
+      dispatch({ payload: { signature } });
       const token = await generateJWT({
         payload: state.payload,
         header: state.header,
         signature,
       });
       setJwtToken(token);
+    } catch (error) {
+      console.error("Error editing signature:", error);
+    }
+  };
+
+  const handleEditPublicKey = async (publicKey: string) => {
+    try {
+      const signature = { ...state.signature } as AsymmetricKey;
+      signature.publicKey = publicKey;
+      dispatch({ payload: { signature } });
+      asymmetricSigRef.current = signature;
+      await verify(jwtToken, state.header.alg, signature);
     } catch (error) {
       console.error("Error editing signature:", error);
     }
@@ -448,9 +497,7 @@ const JWTDebugger: React.FC = () => {
           <div className="h-full rounded-md border border-gray-300">
             <div className="flex flex-row justify-evenly gap-3 px-5 py-4">
               <div className="flex w-1/3 flex-col space-y-1.5">
-                <Label className="text-sm uppercase">
-                  header (algorithm and token type)
-                </Label>
+                <Label className="text-sm uppercase">header</Label>
                 <CodeMirror
                   value={JSON.stringify(state?.header || {}, null, 2)}
                   lang="json"
@@ -490,7 +537,8 @@ const JWTDebugger: React.FC = () => {
                   <AsymmetricSignature
                     type={state.header.alg as AsymmetricType}
                     signature={state.signature as AsymmetricKey}
-                    onEditSignature={handleEditAsymmetricSignature}
+                    onEditPrivateKey={handleEditPrivateKey}
+                    onEditPublicKey={handleEditPublicKey}
                   />
                 )}
               </div>

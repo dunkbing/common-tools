@@ -97,7 +97,7 @@ const rawPublic = ({
 }: any) => jwk;
 const rawPrivate = ({ alg, use, key_ops, ext, ...jwk }: any) => jwk;
 
-function getJoseKey(
+async function getJoseKey(
   header: JWTHeaderParameters,
   key: string,
   base64Secret: boolean,
@@ -130,14 +130,14 @@ function getJoseKey(
       if (key.startsWith("-----BEGIN RSA PUBLIC KEY-----")) {
         key = pki.publicKeyToPem(pki.publicKeyFromPem(key));
       }
-      return Promise.any([
+      return await Promise.any([
         jose.importSPKI(key, header.alg),
         jose.importX509(key, header.alg),
         Promise.resolve()
           .then(() => JSON.parse(key))
           .then(rawPublic)
-          .then((jwk) => {
-            return jose.importJWK(jwk, header.alg);
+          .then((jwk_2) => {
+            return jose.importJWK(jwk_2, header.alg);
           }),
       ]);
     default:
@@ -151,7 +151,6 @@ export async function sign(
   secretOrPrivateKeyString: string,
   base64Secret = false
 ) {
-  console.log(payload);
   if (!header.alg) {
     return Promise.reject(new Error('Missing "alg" claim in header'));
   }
