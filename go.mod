@@ -6,7 +6,7 @@ toolchain go1.22.0
 
 require (
 	github.com/tdewolff/minify/v2 v2.20.19
-	github.com/wailsapp/wails/v2 v2.8.0
+	github.com/wailsapp/wails/v2 v2.8.1
 )
 
 require (
